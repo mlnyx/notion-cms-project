@@ -1,0 +1,537 @@
+{
+  "tasks": [
+    {
+      "id": "a53fdf6d-fe68-4685-91f0-391db01d5498",
+      "name": "Notion API 환경 설정",
+      "description": "Phase 1의 핵심 작업. Notion API 연동을 위한 환경 변수 설정 및 기본 클라이언트 구성.\\n\\n작업 내용:\\n1. .env.local 파일 생성 (VITE_NOTION_API_KEY, VITE_NOTION_DATABASE_ID)\\n2. .env.example 파일 생성 (환경 변수 템플릿)\\n3. vite.config.ts에 환경 변수 타입 추가\\n4. Notion API 연결 테스트용 간단한 스크립트 작성",
+      "notes": "Notion API는 브라우저에서 직접 호출 시 CORS 에러 발생. Phase 1에서는 환경 설정만 완료하고, 실제 API 호출은 Phase 2에서 서버리스 함수로 구현.",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": ".env.local",
+          "type": "CREATE",
+          "description": "Notion API 환경 변수"
+        },
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "환경 변수 템플릿"
+        },
+        {
+          "path": "src/vite-env.d.ts",
+          "type": "TO_MODIFY",
+          "description": "환경 변수 타입 정의"
+        }
+      ],
+      "implementationGuide": "1. 프로젝트 루트에 .env.local 생성\\n2. VITE_NOTION_API_KEY=secret_xxx 형식으로 환경 변수 정의\\n3. src/vite-env.d.ts에 ImportMetaEnv 타입 확장\\n\\npseudocode:\\ninterface ImportMetaEnv {\\n  VITE_NOTION_API_KEY: string\\n  VITE_NOTION_DATABASE_ID: string\\n}",
+      "verificationCriteria": "1. .env.local 파일이 존재하고 환경 변수가 정의됨\\n2. .env.example 파일이 커밋 가능한 상태로 존재\\n3. TypeScript에서 import.meta.env 자동완성 동작",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "f54b8097-9305-4810-a50a-9f30b9272f71",
+      "name": "아이디어 타입 정의",
+      "description": "Phase 2의 첫 번째 작업. Notion 데이터베이스 스키마에 맞는 TypeScript 타입 정의.\\n\\nNotion DB 필드 매핑:\\n- Title → title: string\\n- Problem → problem: string\\n- Real Case → realCase: string\\n- AI Approach → aiApproach: string\\n- Target → target: Target[]\\n- Category → category: Category[]\\n- Business Potential → businessPotential: BusinessPotential\\n- Technical Difficulty → technicalDifficulty: TechnicalDifficulty\\n- Created Date → createdAt: string",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "a53fdf6d-fe68-4685-91f0-391db01d5498"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/types/idea.ts",
+          "type": "CREATE",
+          "description": "아이디어 타입 정의"
+        },
+        {
+          "path": "src/types/index.ts",
+          "type": "TO_MODIFY",
+          "description": "타입 익스포트 추가"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "Notion DB 스키마 참조"
+        }
+      ],
+      "implementationGuide": "src/types/idea.ts 생성:\\n\\npseudocode:\\nexport type Target = '의사' | '환자' | '스태프' | '기공사' | '학생'\\nexport type Category = '진단' | '상담' | '운영' | '교육' | '행정'\\nexport type BusinessPotential = '상' | '중' | '하'\\nexport type TechnicalDifficulty = '상' | '중' | '하'\\n\\nexport interface Idea {\\n  id: string\\n  title: string\\n  problem: string\\n  realCase: string\\n  aiApproach: string\\n  target: Target[]\\n  category: Category[]\\n  businessPotential: BusinessPotential\\n  technicalDifficulty: TechnicalDifficulty\\n  createdAt: string\\n}",
+      "verificationCriteria": "1. Idea 인터페이스가 PRD.md의 Notion DB 스키마와 일치\\n2. 모든 타입에 any 사용 없음\\n3. src/types/index.ts에서 정상 익스포트",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "a0f11d98-7791-44a8-b678-c410e7aaa4fb",
+      "name": "Notion API 서버리스 함수 구현",
+      "description": "Phase 2 작업. CORS 문제 해결을 위한 Vercel Serverless Functions 구현. 아이디어 목록 조회 및 단일 조회 API 엔드포인트 생성.",
+      "notes": "@notionhq/client 패키지 설치 필요: npm install @notionhq/client",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "api/ideas/index.ts",
+          "type": "CREATE",
+          "description": "아이디어 목록 API"
+        },
+        {
+          "path": "api/ideas/[id].ts",
+          "type": "CREATE",
+          "description": "아이디어 상세 API"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "@notionhq/client 의존성 추가"
+        }
+      ],
+      "implementationGuide": "1. api/ 디렉토리 생성 (Vercel Serverless Functions)\\n2. api/ideas/index.ts - 목록 조회\\n3. api/ideas/[id].ts - 단일 조회\\n\\npseudocode:\\n// api/ideas/index.ts\\nimport { Client } from '@notionhq/client'\\n\\nexport default async function handler(req, res) {\\n  const notion = new Client({ auth: process.env.NOTION_API_KEY })\\n  const response = await notion.databases.query({\\n    database_id: process.env.NOTION_DATABASE_ID,\\n    sorts: [{ property: 'Created Date', direction: 'descending' }]\\n  })\\n  const ideas = response.results.map(parseNotionPage)\\n  res.json(ideas)\\n}",
+      "verificationCriteria": "1. npm run dev 실행 후 /api/ideas 엔드포인트 응답 확인\\n2. /api/ideas/[id] 엔드포인트 단일 아이디어 반환\\n3. Notion DB 데이터가 Idea 타입으로 정상 파싱",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "365942dd-d7f5-44b9-afc9-066ab0b550b7",
+      "name": "아이디어 조회 훅 구현",
+      "description": "Phase 2 작업. TanStack Query를 활용한 아이디어 데이터 조회 커스텀 훅 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "a0f11d98-7791-44a8-b678-c410e7aaa4fb"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/hooks/useIdeas.ts",
+          "type": "CREATE",
+          "description": "아이디어 조회 훅"
+        },
+        {
+          "path": "src/lib/queryClient.ts",
+          "type": "REFERENCE",
+          "description": "Query 클라이언트 설정 참조"
+        }
+      ],
+      "implementationGuide": "src/hooks/useIdeas.ts 생성:\\n\\npseudocode:\\nimport { useQuery } from '@tanstack/react-query'\\nimport type { Idea } from '@/types/idea'\\n\\nasync function fetchIdeas(): Promise<Idea[]> {\\n  const res = await fetch('/api/ideas')\\n  return res.json()\\n}\\n\\nasync function fetchIdeaById(id: string): Promise<Idea> {\\n  const res = await fetch(`/api/ideas/${id}`)\\n  return res.json()\\n}\\n\\nexport function useIdeas() {\\n  return useQuery({ queryKey: ['ideas'], queryFn: fetchIdeas })\\n}\\n\\nexport function useIdeaById(id: string) {\\n  return useQuery({ queryKey: ['ideas', id], queryFn: () => fetchIdeaById(id) })\\n}",
+      "verificationCriteria": "1. useIdeas() 훅이 아이디어 배열 반환\\n2. useIdeaById(id) 훅이 단일 아이디어 반환\\n3. 로딩, 에러 상태 정상 처리",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a",
+      "name": "TagBadge 컴포넌트 구현",
+      "description": "Phase 2 작업. 태그 표시용 배지 컴포넌트 구현. Target, Category, BusinessPotential, TechnicalDifficulty 타입별 색상 구분.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/ui/badge.tsx",
+          "type": "CREATE",
+          "description": "shadcn/ui Badge (자동 생성)"
+        },
+        {
+          "path": "src/components/TagBadge.tsx",
+          "type": "CREATE",
+          "description": "태그 배지 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. npx shadcn@latest add badge 실행\\n2. src/components/TagBadge.tsx 생성\\n\\npseudocode:\\ninterface TagBadgeProps {\\n  type: 'target' | 'category' | 'potential' | 'difficulty'\\n  value: string\\n}\\n\\nconst colorMap = {\\n  target: { 의사: 'blue', 환자: 'green', ... },\\n  potential: { 상: 'red', 중: 'yellow', 하: 'gray' },\\n  ...\\n}\\n\\nexport function TagBadge({ type, value }: TagBadgeProps) {\\n  return <Badge variant={getVariant(type, value)}>{value}</Badge>\\n}",
+      "verificationCriteria": "1. TagBadge 컴포넌트가 type별로 다른 색상 표시\\n2. 모든 Target, Category, Potential, Difficulty 값 지원\\n3. 반응형 크기 적용",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "34674e82-7f81-4869-878a-d6f048625407",
+      "name": "IdeaCard 컴포넌트 구현",
+      "description": "Phase 3 핵심 작업. 아이디어 목록에서 사용할 카드 컴포넌트. 제목, 타겟 태그, 사업성/난이도 배지 표시.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a"
+        },
+        {
+          "taskId": "365942dd-d7f5-44b9-afc9-066ab0b550b7"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/IdeaCard.tsx",
+          "type": "CREATE",
+          "description": "아이디어 카드 컴포넌트"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "REFERENCE",
+          "description": "기존 Card 컴포넌트 활용"
+        }
+      ],
+      "implementationGuide": "src/components/IdeaCard.tsx 생성:\\n\\npseudocode:\\nimport { Card, CardHeader, CardContent } from '@/components/ui/card'\\nimport { TagBadge } from './TagBadge'\\nimport { Link } from '@tanstack/react-router'\\nimport type { Idea } from '@/types/idea'\\n\\ninterface IdeaCardProps {\\n  idea: Idea\\n}\\n\\nexport function IdeaCard({ idea }: IdeaCardProps) {\\n  return (\\n    <Link to='/ideas/$id' params={{ id: idea.id }}>\\n      <Card className='hover:shadow-lg transition-shadow'>\\n        <CardHeader>\\n          <h3>{idea.title}</h3>\\n          <div className='flex gap-2'>\\n            {idea.target.map(t => <TagBadge type='target' value={t} />)}\\n          </div>\\n        </CardHeader>\\n        <CardContent>\\n          <div className='flex gap-2'>\\n            <TagBadge type='potential' value={idea.businessPotential} />\\n            <TagBadge type='difficulty' value={idea.technicalDifficulty} />\\n          </div>\\n        </CardContent>\\n      </Card>\\n    </Link>\\n  )\\n}",
+      "verificationCriteria": "1. 카드에 제목, 타겟 태그, 사업성/난이도 배지 표시\\n2. 카드 클릭 시 상세 페이지로 이동\\n3. hover 효과 적용\\n4. 반응형 레이아웃",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "641b21b6-7023-4041-8f4b-6d186585db0b",
+      "name": "IdeaDetail 컴포넌트 구현",
+      "description": "Phase 3 핵심 작업. 아이디어 상세 정보를 섹션별로 구조화하여 표시하는 컴포넌트.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a"
+        },
+        {
+          "taskId": "365942dd-d7f5-44b9-afc9-066ab0b550b7"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/IdeaDetail.tsx",
+          "type": "CREATE",
+          "description": "아이디어 상세 컴포넌트"
+        }
+      ],
+      "implementationGuide": "src/components/IdeaDetail.tsx 생성:\\n\\npseudocode:\\ninterface IdeaDetailProps {\\n  idea: Idea\\n}\\n\\nexport function IdeaDetail({ idea }: IdeaDetailProps) {\\n  return (\\n    <article className='space-y-8'>\\n      <header>\\n        <h1>{idea.title}</h1>\\n        <div className='flex gap-2'>{/* 모든 태그 표시 */}</div>\\n      </header>\\n      \\n      <Section title='문제 정의'>{idea.problem}</Section>\\n      <Section title='실제 사례'>{idea.realCase}</Section>\\n      <Section title='AI 접근 방식'>{idea.aiApproach}</Section>\\n      \\n      <footer>\\n        <div>사업성: {idea.businessPotential}</div>\\n        <div>기술 난이도: {idea.technicalDifficulty}</div>\\n        <div>작성일: {formatDate(idea.createdAt)}</div>\\n      </footer>\\n    </article>\\n  )\\n}",
+      "verificationCriteria": "1. 문제 정의, 실제 사례, AI 접근 방식 섹션 구분 표시\\n2. 모든 태그 및 평가 정보 표시\\n3. 작성일 포맷팅\\n4. 반응형 레이아웃",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "5b10302f-6c4f-407a-a112-f244afd0d913",
+      "name": "아이디어 목록 페이지 구현",
+      "description": "Phase 3 핵심 작업. 메인 아이디어 목록 페이지. IdeaCard 그리드로 최신순 표시.",
+      "notes": "npx shadcn@latest add skeleton 실행하여 로딩 스켈레톤 추가",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "34674e82-7f81-4869-878a-d6f048625407"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/IdeasPage.tsx",
+          "type": "CREATE",
+          "description": "아이디어 목록 페이지"
+        },
+        {
+          "path": "src/pages/index.ts",
+          "type": "TO_MODIFY",
+          "description": "페이지 익스포트 추가"
+        },
+        {
+          "path": "src/app/router.tsx",
+          "type": "TO_MODIFY",
+          "description": "/ideas 라우트 추가"
+        }
+      ],
+      "implementationGuide": "1. src/pages/IdeasPage.tsx 생성\\n2. src/pages/index.ts에 익스포트 추가\\n3. router.tsx에 /ideas 라우트 추가\\n\\npseudocode:\\nexport function IdeasPage() {\\n  const { data: ideas, isLoading, error } = useIdeas()\\n  \\n  if (isLoading) return <LoadingSkeleton />\\n  if (error) return <ErrorMessage />\\n  \\n  return (\\n    <div className='container mx-auto px-4 py-8'>\\n      <h1>치과 AI 아이디어</h1>\\n      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>\\n        {ideas?.map(idea => <IdeaCard key={idea.id} idea={idea} />)}\\n      </div>\\n    </div>\\n  )\\n}",
+      "verificationCriteria": "1. /ideas 경로에서 아이디어 목록 그리드 표시\\n2. 최신순 정렬\\n3. 로딩/에러 상태 처리\\n4. 반응형 그리드 (1/2/3열)",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "e3c2ec52-f1d9-45d5-8562-fdfa57dc6388",
+      "name": "아이디어 상세 페이지 구현",
+      "description": "Phase 3 핵심 작업. 개별 아이디어 상세 페이지. URL 파라미터로 ID 받아 IdeaDetail 표시.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "641b21b6-7023-4041-8f4b-6d186585db0b"
+        },
+        {
+          "taskId": "5b10302f-6c4f-407a-a112-f244afd0d913"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/IdeaDetailPage.tsx",
+          "type": "CREATE",
+          "description": "아이디어 상세 페이지"
+        },
+        {
+          "path": "src/pages/index.ts",
+          "type": "TO_MODIFY",
+          "description": "페이지 익스포트 추가"
+        },
+        {
+          "path": "src/app/router.tsx",
+          "type": "TO_MODIFY",
+          "description": "/ideas/$id 라우트 추가"
+        }
+      ],
+      "implementationGuide": "1. src/pages/IdeaDetailPage.tsx 생성\\n2. router.tsx에 /ideas/$id 라우트 추가\\n\\npseudocode:\\nexport function IdeaDetailPage() {\\n  const { id } = Route.useParams()\\n  const { data: idea, isLoading, error } = useIdeaById(id)\\n  \\n  if (isLoading) return <LoadingSkeleton />\\n  if (error || !idea) return <NotFound />\\n  \\n  return (\\n    <div className='container mx-auto px-4 py-8'>\\n      <BackButton />\\n      <IdeaDetail idea={idea} />\\n    </div>\\n  )\\n}\\n\\n// router.tsx\\nconst ideaDetailRoute = createRoute({\\n  getParentRoute: () => rootRoute,\\n  path: '/ideas/$id',\\n  component: IdeaDetailPage\\n})",
+      "verificationCriteria": "1. /ideas/[id] 경로에서 해당 아이디어 상세 표시\\n2. 존재하지 않는 ID 접근 시 404 처리\\n3. 뒤로가기 버튼 동작\\n4. 로딩/에러 상태 처리",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "08b7214d-b02a-48b1-9ffa-c933ae2d5207",
+      "name": "Header 네비게이션 업데이트",
+      "description": "Phase 3 마무리 작업. Header에 아이디어 목록 페이지 링크 추가 및 사이트 제목 변경.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "5b10302f-6c4f-407a-a112-f244afd0d913"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/Header.tsx",
+          "type": "TO_MODIFY",
+          "description": "네비게이션 링크 추가",
+          "lineStart": 16,
+          "lineEnd": 32
+        }
+      ],
+      "implementationGuide": "src/components/layout/Header.tsx 수정:\\n\\npseudocode:\\n// 기존 nav 링크에 추가\\n<Link to='/ideas'>아이디어</Link>\\n\\n// 사이트 제목 변경\\n<Link to='/' className='text-xl font-bold'>\\n  치과 AI 아이디어 로그북\\n</Link>",
+      "verificationCriteria": "1. Header에 '아이디어' 링크 표시\\n2. 사이트 제목이 '치과 AI 아이디어 로그북'으로 변경\\n3. 활성 페이지 스타일 적용",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "929fbe30-da2f-4e33-b1b6-4dddd5c98986",
+      "name": "필터 상태 관리 구현",
+      "description": "Phase 4 작업. 태그 기반 필터링을 위한 Zustand 스토어 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "e3c2ec52-f1d9-45d5-8562-fdfa57dc6388"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/stores/useFilterStore.ts",
+          "type": "CREATE",
+          "description": "필터 상태 스토어"
+        },
+        {
+          "path": "src/stores/useAuthStore.ts",
+          "type": "REFERENCE",
+          "description": "스토어 패턴 참조"
+        }
+      ],
+      "implementationGuide": "src/stores/useFilterStore.ts 생성:\\n\\npseudocode:\\nimport { create } from 'zustand'\\nimport type { Target, Category } from '@/types/idea'\\n\\ninterface FilterState {\\n  targets: Target[]\\n  categories: Category[]\\n  searchQuery: string\\n  setTargets: (targets: Target[]) => void\\n  setCategories: (categories: Category[]) => void\\n  setSearchQuery: (query: string) => void\\n  reset: () => void\\n}\\n\\nexport const useFilterStore = create<FilterState>((set) => ({\\n  targets: [],\\n  categories: [],\\n  searchQuery: '',\\n  setTargets: (targets) => set({ targets }),\\n  setCategories: (categories) => set({ categories }),\\n  setSearchQuery: (searchQuery) => set({ searchQuery }),\\n  reset: () => set({ targets: [], categories: [], searchQuery: '' })\\n}))",
+      "verificationCriteria": "1. useFilterStore 훅이 필터 상태 관리\\n2. 타입 안전성 확보 (any 없음)\\n3. reset 함수로 필터 초기화",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "d4c65e56-5836-4414-a1d5-bf61e280c306",
+      "name": "필터링 UI 및 로직 구현",
+      "description": "Phase 4 작업. 태그 기반 필터링 UI 컴포넌트 및 필터 적용 로직 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "929fbe30-da2f-4e33-b1b6-4dddd5c98986"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/IdeaFilter.tsx",
+          "type": "CREATE",
+          "description": "필터 UI 컴포넌트"
+        },
+        {
+          "path": "src/hooks/useIdeas.ts",
+          "type": "TO_MODIFY",
+          "description": "필터 파라미터 지원"
+        },
+        {
+          "path": "src/pages/IdeasPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "필터 컴포넌트 통합"
+        }
+      ],
+      "implementationGuide": "1. src/components/IdeaFilter.tsx 생성\\n2. useIdeas 훅에 필터 파라미터 지원 추가\\n\\npseudocode:\\n// IdeaFilter.tsx\\nexport function IdeaFilter() {\\n  const { targets, categories, setTargets, setCategories } = useFilterStore()\\n  \\n  return (\\n    <div className='flex flex-wrap gap-4'>\\n      <FilterGroup title='대상' options={TARGET_OPTIONS} selected={targets} onChange={setTargets} />\\n      <FilterGroup title='영역' options={CATEGORY_OPTIONS} selected={categories} onChange={setCategories} />\\n    </div>\\n  )\\n}\\n\\n// useIdeas 수정\\nexport function useIdeas(filters?: { targets?: Target[], categories?: Category[] }) {\\n  return useQuery({\\n    queryKey: ['ideas', filters],\\n    queryFn: () => fetchIdeas(filters)\\n  })\\n}",
+      "verificationCriteria": "1. 대상별/영역별 필터 토글 UI\\n2. 필터 적용 시 목록 갱신\\n3. 복수 필터 조합 동작\\n4. 필터 초기화 기능",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "92c9cecf-33b8-4c91-9b92-c1ba8a620c83",
+      "name": "검색 기능 구현",
+      "description": "Phase 4 작업. 제목 기반 아이디어 검색 기능 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "d4c65e56-5836-4414-a1d5-bf61e280c306"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/SearchInput.tsx",
+          "type": "CREATE",
+          "description": "검색 입력 컴포넌트"
+        },
+        {
+          "path": "src/hooks/useDebouncedValue.ts",
+          "type": "CREATE",
+          "description": "디바운스 훅"
+        },
+        {
+          "path": "src/pages/IdeasPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "검색 컴포넌트 통합"
+        }
+      ],
+      "implementationGuide": "1. src/components/SearchInput.tsx 생성\\n2. API 및 훅에 검색 파라미터 지원\\n\\npseudocode:\\n// SearchInput.tsx\\nexport function SearchInput() {\\n  const { searchQuery, setSearchQuery } = useFilterStore()\\n  const [input, setInput] = useState(searchQuery)\\n  const debouncedSearch = useDebouncedValue(input, 300)\\n  \\n  useEffect(() => {\\n    setSearchQuery(debouncedSearch)\\n  }, [debouncedSearch])\\n  \\n  return <Input placeholder='아이디어 검색...' value={input} onChange={e => setInput(e.target.value)} />\\n}",
+      "verificationCriteria": "1. 검색어 입력 시 300ms 디바운스 적용\\n2. 검색 결과 실시간 갱신\\n3. 빈 검색어 시 전체 목록 표시",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "c20e2dd5-d190-48e7-9312-6cd2d655f857",
+      "name": "SEO 메타데이터 설정",
+      "description": "Phase 4 작업. react-helmet-async를 활용한 페이지별 메타데이터 및 Open Graph 태그 설정.",
+      "notes": "App.tsx에 HelmetProvider 래핑 필요",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "92c9cecf-33b8-4c91-9b92-c1ba8a620c83"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/SEO.tsx",
+          "type": "CREATE",
+          "description": "SEO 컴포넌트"
+        },
+        {
+          "path": "src/app/App.tsx",
+          "type": "TO_MODIFY",
+          "description": "HelmetProvider 추가"
+        },
+        {
+          "path": "src/pages/IdeasPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "SEO 적용"
+        },
+        {
+          "path": "src/pages/IdeaDetailPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "SEO 적용"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "react-helmet-async 의존성"
+        }
+      ],
+      "implementationGuide": "1. npm install react-helmet-async\\n2. src/components/SEO.tsx 생성\\n3. 각 페이지에 SEO 컴포넌트 적용\\n\\npseudocode:\\n// SEO.tsx\\nimport { Helmet } from 'react-helmet-async'\\n\\ninterface SEOProps {\\n  title: string\\n  description?: string\\n  ogImage?: string\\n}\\n\\nexport function SEO({ title, description, ogImage }: SEOProps) {\\n  const fullTitle = `${title} | 치과 AI 아이디어 로그북`\\n  return (\\n    <Helmet>\\n      <title>{fullTitle}</title>\\n      <meta name='description' content={description} />\\n      <meta property='og:title' content={fullTitle} />\\n      <meta property='og:description' content={description} />\\n      {ogImage && <meta property='og:image' content={ogImage} />}\\n    </Helmet>\\n  )\\n}",
+      "verificationCriteria": "1. 각 페이지별 고유 title 설정\\n2. Open Graph 메타 태그 생성\\n3. 상세 페이지에 아이디어 제목 반영",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "c65be886-9aaf-46d8-bac8-ce30004ccacb",
+      "name": "성능 최적화 및 캐싱 전략",
+      "description": "Phase 5 작업. TanStack Query 캐싱 최적화 및 코드 스플리팅 적용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c20e2dd5-d190-48e7-9312-6cd2d655f857"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/lib/queryClient.ts",
+          "type": "TO_MODIFY",
+          "description": "캐싱 설정 최적화"
+        },
+        {
+          "path": "src/app/router.tsx",
+          "type": "TO_MODIFY",
+          "description": "코드 스플리팅 적용"
+        }
+      ],
+      "implementationGuide": "1. queryClient 설정 최적화\\n2. React.lazy를 활용한 페이지 코드 스플리팅\\n3. 이미지 최적화 (있을 경우)\\n\\npseudocode:\\n// queryClient.ts 최적화\\nexport const queryClient = new QueryClient({\\n  defaultOptions: {\\n    queries: {\\n      staleTime: 10 * 60 * 1000, // 10분\\n      gcTime: 30 * 60 * 1000, // 30분\\n      refetchOnMount: false\\n    }\\n  }\\n})\\n\\n// router.tsx 코드 스플리팅\\nconst IdeasPage = lazy(() => import('@/pages/IdeasPage'))\\nconst IdeaDetailPage = lazy(() => import('@/pages/IdeaDetailPage'))",
+      "verificationCriteria": "1. 페이지 전환 시 캐시된 데이터 즉시 표시\\n2. 코드 스플리팅으로 초기 번들 크기 감소\\n3. Lighthouse 성능 점수 80점 이상",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "53a331ce-9526-43c8-88ef-05b6d773fbb4",
+      "name": "반응형 디자인 점검 및 개선",
+      "description": "Phase 5 작업. 모바일/태블릿/데스크톱 전 화면 크기에서 레이아웃 점검 및 개선.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c65be886-9aaf-46d8-bac8-ce30004ccacb"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/Header.tsx",
+          "type": "TO_MODIFY",
+          "description": "모바일 네비게이션"
+        },
+        {
+          "path": "src/pages/IdeasPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "반응형 그리드"
+        },
+        {
+          "path": "src/components/IdeaFilter.tsx",
+          "type": "TO_MODIFY",
+          "description": "모바일 필터 UI"
+        }
+      ],
+      "implementationGuide": "전체 컴포넌트 반응형 점검:\\n\\n1. Header: 모바일 햄버거 메뉴 필요 여부 확인\\n2. IdeaCard 그리드: sm:1열, md:2열, lg:3열\\n3. IdeaDetail: 모바일에서 섹션 간격 조정\\n4. IdeaFilter: 모바일에서 접기/펼치기\\n5. Footer: 모바일 레이아웃\\n\\npseudocode:\\n// 반응형 그리드 예시\\n<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>",
+      "verificationCriteria": "1. 320px~1920px 화면에서 깨짐 없음\\n2. 터치 영역 최소 44px 확보\\n3. 텍스트 가독성 유지",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    },
+    {
+      "id": "1a493e3a-3778-440d-93b2-5d65a4f59b5d",
+      "name": "Vercel 배포 설정",
+      "description": "Phase 5 최종 작업. Vercel 프로덕션 배포 및 환경 변수 설정.",
+      "notes": "Vercel CLI: npm i -g vercel && vercel",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "53a331ce-9526-43c8-88ef-05b6d773fbb4"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "relatedFiles": [
+        {
+          "path": "vercel.json",
+          "type": "CREATE",
+          "description": "Vercel 배포 설정"
+        },
+        {
+          "path": "package.json",
+          "type": "REFERENCE",
+          "description": "빌드 스크립트 확인"
+        }
+      ],
+      "implementationGuide": "1. vercel.json 설정 파일 생성\\n2. Vercel 프로젝트 환경 변수 설정\\n3. 프로덕션 빌드 테스트\\n\\npseudocode:\\n// vercel.json\\n{\\n  \"buildCommand\": \"npm run build\",\\n  \"outputDirectory\": \"dist\",\\n  \"framework\": \"vite\",\\n  \"rewrites\": [\\n    { \"source\": \"/(.*)\", \"destination\": \"/index.html\" }\\n  ]\\n}\\n\\n// 환경 변수 (Vercel Dashboard)\\n- NOTION_API_KEY (서버리스 함수용, VITE_ 접두사 없음)\\n- NOTION_DATABASE_ID",
+      "verificationCriteria": "1. vercel --prod 명령으로 배포 성공\\n2. 프로덕션 URL에서 정상 동작\\n3. 환경 변수가 안전하게 설정됨\\n4. HTTPS 적용 확인",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+    }
+  ]
+}
