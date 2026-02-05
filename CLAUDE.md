@@ -22,6 +22,12 @@
 - 📄 **프로젝트 요구사항 (PRD)**: `@docs/PRD.md` - 전체 시스템 상세 명세
 - 🗺 **개발 로드맵**: `@docs/ROADMAP.md` - 개발 단계 및 완료 기준
 
+### 프로젝트 규칙
+
+- 🎨 **코드 스타일**: `@.claude/rules/code-style.md` - 네이밍, 포맷팅 규칙
+- 🧩 **컴포넌트 패턴**: `@.claude/rules/components.md` - 컴포넌트 작성 가이드
+- 🔌 **API 가이드**: `@.claude/rules/api.md` - Notion API 사용법
+
 ---
 
 ## ⚡ 자주 사용하는 명령어
