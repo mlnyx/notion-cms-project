@@ -6,6 +6,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'latest', label: '최신순' },
   { value: 'potential-desc', label: '사업성 높은순' },
   { value: 'difficulty-asc', label: '난이도 낮은순' },
+  { value: 'popular', label: '인기순' },
 ];
 
 /** 정렬 선택 컴포넌트 */

@@ -8,7 +8,7 @@ import type {
 } from '@/types/idea';
 
 /** 정렬 옵션 */
-export type SortOption = 'latest' | 'potential-desc' | 'difficulty-asc';
+export type SortOption = 'latest' | 'potential-desc' | 'difficulty-asc' | 'popular';
 
 /** 필터 스토어 상태 */
 interface FilterState {

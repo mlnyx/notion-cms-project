@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useIdeas } from '@/hooks/useIdeas';
+import { useVotes } from '@/hooks/useVotes';
 import { IdeaCard } from '@/components/IdeaCard';
 import { FilterPanel } from '@/components/FilterPanel';
 import { SearchBar } from '@/components/SearchBar';
@@ -33,10 +34,11 @@ function joinParam(arr: string[]): string | undefined {
   return arr.length > 0 ? arr.join(',') : undefined;
 }
 
-const VALID_SORTS: SortOption[] = ['latest', 'potential-desc', 'difficulty-asc'];
+const VALID_SORTS: SortOption[] = ['latest', 'potential-desc', 'difficulty-asc', 'popular'];
 
 export function HomePage() {
   const { data: ideas, isLoading, error } = useIdeas();
+  const { data: votesMap = {} } = useVotes();
   const navigate = useNavigate({ from: '/' });
   const search = useSearch({ from: '/' });
   const isInitialized = useRef(false);
@@ -131,6 +133,8 @@ export function HomePage() {
           return LEVEL_MAP[b.businessPotential] - LEVEL_MAP[a.businessPotential];
         case 'difficulty-asc':
           return LEVEL_MAP[a.technicalDifficulty] - LEVEL_MAP[b.technicalDifficulty];
+        case 'popular':
+          return (votesMap[b.id] ?? 0) - (votesMap[a.id] ?? 0);
         case 'latest':
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -138,7 +142,7 @@ export function HomePage() {
     });
 
     return result;
-  }, [ideas, selectedTargets, selectedCategories, selectedPotentials, selectedDifficulties, selectedStatuses, searchQuery, sortBy]);
+  }, [ideas, selectedTargets, selectedCategories, selectedPotentials, selectedDifficulties, selectedStatuses, searchQuery, sortBy, votesMap]);
 
   return (
     <div className="container mx-auto px-4 py-8">
