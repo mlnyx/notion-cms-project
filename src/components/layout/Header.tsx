@@ -1,33 +1,33 @@
-import { Link } from '@tanstack/react-router'
-import { Moon, Sun } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useThemeStore } from '@/stores/useThemeStore'
+import { Link } from '@tanstack/react-router';
+import { Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 export function Header() {
-  const { theme, setTheme } = useThemeStore()
+  const { theme, setTheme } = useThemeStore();
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <header className="border-b border-border bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <nav className="flex items-center gap-6">
           <Link to="/" className="text-xl font-bold">
-            React Starter
+            Dental AI Lab
           </Link>
           <Link
             to="/"
             className="text-muted-foreground transition-colors hover:text-foreground [&.active]:text-foreground"
           >
-            홈
+            아이디어
           </Link>
           <Link
-            to="/about"
+            to="/dashboard"
             className="text-muted-foreground transition-colors hover:text-foreground [&.active]:text-foreground"
           >
-            소개
+            대시보드
           </Link>
         </nav>
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -40,5 +40,5 @@ export function Header() {
         </Button>
       </div>
     </header>
-  )
+  );
 }
