@@ -5,6 +5,8 @@ import { IdeaDetail } from '@/components/IdeaDetail';
 import { RelatedIdeas } from '@/components/RelatedIdeas';
 import { SEOHead } from '@/components/SEOHead';
 import { ShareButton } from '@/components/ShareButton';
+import { VoteButton } from '@/components/VoteButton';
+import { GiscusComments } from '@/components/GiscusComments';
 import { useIdeaById, useIdeas } from '@/hooks/useIdeas';
 
 interface IdeaDetailPageProps {
@@ -31,12 +33,15 @@ export function IdeaDetailPage({ id }: IdeaDetailPageProps) {
             목록으로
           </Link>
         </Button>
-        {idea && (
-          <ShareButton
-            title={idea.title}
-            text={idea.problem}
-          />
-        )}
+        <div className="flex items-center gap-2">
+          {idea && <VoteButton ideaId={idea.id} />}
+          {idea && (
+            <ShareButton
+              title={idea.title}
+              text={idea.problem}
+            />
+          )}
+        </div>
       </div>
 
       {isLoading && <p className="text-muted-foreground">불러오는 중...</p>}
@@ -46,6 +51,18 @@ export function IdeaDetailPage({ id }: IdeaDetailPageProps) {
       {idea && allIdeas && (
         <div className="mt-10 border-t border-border pt-8">
           <RelatedIdeas currentIdea={idea} allIdeas={allIdeas} />
+        </div>
+      )}
+
+      {idea && (
+        <div className="mt-10 border-t border-border pt-8">
+          <h2 className="mb-4 text-lg font-semibold">댓글</h2>
+          <GiscusComments
+            repo="mlnyx/notion-cms-project"
+            repoId="R_kgDORGiy6w"
+            category="General"
+            categoryId="DIC_kwDORGiy684C30yY"
+          />
         </div>
       )}
     </div>
