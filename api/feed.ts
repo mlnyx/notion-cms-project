@@ -4,10 +4,32 @@
  * 최신 아이디어를 RSS XML 형식으로 반환
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { Client } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import { notion, getDatabaseId } from './_lib/notionClient';
-import { parseNotionPage } from './_lib/parseNotionPage';
-import type { Idea } from './_types/idea';
+
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+
+type Props = PageObjectResponse['properties'][string];
+
+function getTitleText(p: Props): string {
+  return p.type === 'title' ? p.title.map((t) => t.plain_text).join('') : '';
+}
+
+function getRichText(p: Props): string {
+  return p.type === 'rich_text' ? p.rich_text.map((t) => t.plain_text).join('') : '';
+}
+
+interface FeedIdea { id: string; title: string; problem: string; createdAt: string; }
+
+function parseFeedPage(page: PageObjectResponse): FeedIdea {
+  const p = page.properties;
+  return {
+    id: page.id,
+    title: p['Title'] ? getTitleText(p['Title']) : '',
+    problem: p['Problem'] ? getRichText(p['Problem']) : '',
+    createdAt: p['Created Date']?.type === 'date' && p['Created Date'].date ? p['Created Date'].date.start : '',
+  };
+}
 
 /** 특수 문자를 XML 이스케이프 처리합니다 */
 function escapeXml(text: string): string {
@@ -20,7 +42,7 @@ function escapeXml(text: string): string {
 }
 
 /** Idea를 RSS <item> XML로 변환합니다 */
-function ideaToRssItem(idea: Idea, siteUrl: string): string {
+function ideaToRssItem(idea: FeedIdea, siteUrl: string): string {
   const link = `${siteUrl}/ideas/${idea.id}`;
   const pubDate = idea.createdAt
     ? new Date(idea.createdAt).toUTCString()
@@ -45,11 +67,10 @@ export default async function handler(
   }
 
   try {
-    const databaseId = getDatabaseId();
-    const siteUrl = process.env.SITE_URL || 'https://dental-ai-lab.vercel.app';
+    const siteUrl = process.env.SITE_URL || 'https://notion-cms-project-nine.vercel.app';
 
     const response = await notion.databases.query({
-      database_id: databaseId,
+      database_id: process.env.NOTION_DATABASE_ID!,
       sorts: [{ property: 'Created Date', direction: 'descending' }],
     });
 
@@ -57,7 +78,7 @@ export default async function handler(
       (page): page is PageObjectResponse => 'properties' in page,
     );
 
-    const ideas = pages.map(parseNotionPage);
+    const ideas = pages.map(parseFeedPage);
     const items = ideas.map((idea) => ideaToRssItem(idea, siteUrl)).join('\n');
 
     const rss = `<?xml version="1.0" encoding="UTF-8"?>

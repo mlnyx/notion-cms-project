@@ -3,83 +3,81 @@
  * Notion 페이지 ID로 단일 아이디어를 조회합니다
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { Client } from '@notionhq/client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import { notion } from '../_lib/notionClient';
-import { parseNotionPage } from '../_lib/parseNotionPage';
 
-/** CORS 헤더를 설정합니다 */
-function setCorsHeaders(res: VercelResponse): void {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+
+type Props = PageObjectResponse['properties'][string];
+
+function getTitleText(p: Props): string {
+  return p.type === 'title' ? p.title.map((t) => t.plain_text).join('') : '';
 }
 
-/** 요청에서 id 파라미터를 추출합니다 */
-function extractId(query: VercelRequest['query']): string | null {
-  const id = query.id;
+function getRichText(p: Props): string {
+  return p.type === 'rich_text' ? p.rich_text.map((t) => t.plain_text).join('') : '';
+}
 
-  if (typeof id === 'string' && id.length > 0) {
-    return id;
-  }
+function getMultiSelect(p: Props): string[] {
+  return p.type === 'multi_select' ? p.multi_select.map((i) => i.name) : [];
+}
 
-  return null;
+function getSelect(p: Props, fallback: string): string {
+  return p.type === 'select' && p.select ? p.select.name : fallback;
+}
+
+function getDate(p: Props): string {
+  return p.type === 'date' && p.date ? p.date.start : '';
+}
+
+function parsePage(page: PageObjectResponse) {
+  const p = page.properties;
+  return {
+    id: page.id,
+    title: p['Title'] ? getTitleText(p['Title']) : '',
+    problem: p['Problem'] ? getRichText(p['Problem']) : '',
+    realCase: p['Real Case'] ? getRichText(p['Real Case']) : '',
+    aiApproach: p['AI Approach'] ? getRichText(p['AI Approach']) : '',
+    target: p['Target'] ? getMultiSelect(p['Target']) : [],
+    category: p['Category'] ? getMultiSelect(p['Category']) : [],
+    businessPotential: p['Business Potential'] ? getSelect(p['Business Potential'], '중') : '중',
+    technicalDifficulty: p['Technical Difficulty'] ? getSelect(p['Technical Difficulty'], '중') : '중',
+    createdAt: p['Created Date'] ? getDate(p['Created Date']) : '',
+  };
 }
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
-  setCorsHeaders(res);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // CORS preflight 요청 처리
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+  if (req.method !== 'GET') { res.status(405).json({ error: '허용되지 않는 메서드입니다' }); return; }
 
-  // GET 메서드만 허용
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: '허용되지 않는 메서드입니다' });
-    return;
-  }
-
-  const id = extractId(req.query);
-
-  if (!id) {
-    res.status(400).json({ error: '아이디어 ID가 필요합니다' });
-    return;
-  }
+  const id = typeof req.query.id === 'string' ? req.query.id : null;
+  if (!id) { res.status(400).json({ error: '아이디어 ID가 필요합니다' }); return; }
 
   try {
     const page = await notion.pages.retrieve({ page_id: id });
 
-    // PageObjectResponse 타입 가드
     if (!('properties' in page)) {
       res.status(404).json({ error: '아이디어를 찾을 수 없습니다' });
       return;
     }
 
-    const idea = parseNotionPage(page as PageObjectResponse);
-
-    res.status(200).json(idea);
+    res.status(200).json(parsePage(page as PageObjectResponse));
   } catch (error) {
     console.error(`아이디어 조회 실패 (id: ${id}):`, error);
 
-    // Notion API 404 에러 처리
-    if (
-      error instanceof Object &&
-      'status' in error &&
-      (error as { status: number }).status === 404
-    ) {
+    if (error instanceof Object && 'status' in error && (error as { status: number }).status === 404) {
       res.status(404).json({ error: '아이디어를 찾을 수 없습니다' });
       return;
     }
 
-    const message =
-      error instanceof Error
-        ? error.message
-        : '알 수 없는 오류가 발생했습니다';
-
+    const message = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다';
     res.status(500).json({ error: message });
   }
 }

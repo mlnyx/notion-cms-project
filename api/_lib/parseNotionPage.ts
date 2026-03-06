@@ -57,6 +57,19 @@ function getDate(property: PageObjectResponse['properties'][string]): string {
 }
 
 /**
+ * 속성 이름으로 프로퍼티를 찾습니다 (앞뒤 공백 허용)
+ */
+function findProp(
+  props: PageObjectResponse['properties'],
+  name: string,
+): PageObjectResponse['properties'][string] | undefined {
+  if (props[name]) return props[name];
+  // 공백이 포함된 키를 탐색
+  const key = Object.keys(props).find((k) => k.trim() === name);
+  return key ? props[key] : undefined;
+}
+
+/**
  * Notion 페이지 객체를 Idea 타입으로 변환합니다
  * @param page - Notion 페이지 객체
  * @returns 파싱된 Idea 객체
@@ -66,14 +79,14 @@ export function parseNotionPage(page: PageObjectResponse): Idea {
 
   return {
     id: page.id,
-    title: getTitleText(props['Title']),
-    problem: getRichText(props['Problem']),
-    realCase: getRichText(props['Real Case']),
-    aiApproach: getRichText(props['AI Approach']),
-    target: getMultiSelect<Target>(props['Target']),
-    category: getMultiSelect<Category>(props['Category']),
-    businessPotential: getSelect<BusinessPotential>(props['Business Potential'], '중'),
-    technicalDifficulty: getSelect<TechnicalDifficulty>(props['Technical Difficulty'], '중'),
-    createdAt: getDate(props['Created Date']),
+    title: findProp(props, 'Title') ? getTitleText(findProp(props, 'Title')!) : '',
+    problem: findProp(props, 'Problem') ? getRichText(findProp(props, 'Problem')!) : '',
+    realCase: findProp(props, 'Real Case') ? getRichText(findProp(props, 'Real Case')!) : '',
+    aiApproach: findProp(props, 'AI Approach') ? getRichText(findProp(props, 'AI Approach')!) : '',
+    target: findProp(props, 'Target') ? getMultiSelect<Target>(findProp(props, 'Target')!) : [],
+    category: findProp(props, 'Category') ? getMultiSelect<Category>(findProp(props, 'Category')!) : [],
+    businessPotential: findProp(props, 'Business Potential') ? getSelect<BusinessPotential>(findProp(props, 'Business Potential')!, '중') : '중',
+    technicalDifficulty: findProp(props, 'Technical Difficulty') ? getSelect<TechnicalDifficulty>(findProp(props, 'Technical Difficulty')!, '중') : '중',
+    createdAt: findProp(props, 'Created Date') ? getDate(findProp(props, 'Created Date')!) : '',
   };
 }
