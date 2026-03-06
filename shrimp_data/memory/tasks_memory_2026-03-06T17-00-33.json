@@ -1,0 +1,137 @@
+{
+  "tasks": [
+    {
+      "id": "a53fdf6d-fe68-4685-91f0-391db01d5498",
+      "name": "Notion API 환경 설정",
+      "description": "Phase 1의 핵심 작업. Notion API 연동을 위한 환경 변수 설정 및 기본 클라이언트 구성.\\n\\n작업 내용:\\n1. .env.local 파일 생성 (VITE_NOTION_API_KEY, VITE_NOTION_DATABASE_ID)\\n2. .env.example 파일 생성 (환경 변수 템플릿)\\n3. vite.config.ts에 환경 변수 타입 추가\\n4. Notion API 연결 테스트용 간단한 스크립트 작성",
+      "notes": "Notion API는 브라우저에서 직접 호출 시 CORS 에러 발생. Phase 1에서는 환경 설정만 완료하고, 실제 API 호출은 Phase 2에서 서버리스 함수로 구현.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-03-06T06:19:35.556Z",
+      "relatedFiles": [
+        {
+          "path": ".env.local",
+          "type": "CREATE",
+          "description": "Notion API 환경 변수"
+        },
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "환경 변수 템플릿"
+        },
+        {
+          "path": "src/vite-env.d.ts",
+          "type": "TO_MODIFY",
+          "description": "환경 변수 타입 정의"
+        }
+      ],
+      "implementationGuide": "1. 프로젝트 루트에 .env.local 생성\\n2. VITE_NOTION_API_KEY=secret_xxx 형식으로 환경 변수 정의\\n3. src/vite-env.d.ts에 ImportMetaEnv 타입 확장\\n\\npseudocode:\\ninterface ImportMetaEnv {\\n  VITE_NOTION_API_KEY: string\\n  VITE_NOTION_DATABASE_ID: string\\n}",
+      "verificationCriteria": "1. .env.local 파일이 존재하고 환경 변수가 정의됨\\n2. .env.example 파일이 커밋 가능한 상태로 존재\\n3. TypeScript에서 import.meta.env 자동완성 동작",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수.",
+      "summary": "Notion API 환경 설정 완료. .env.local 및 .env.local.example 파일이 생성되어 NOTION_API_KEY, NOTION_DATABASE_ID 환경 변수가 구성됨.",
+      "completedAt": "2026-03-06T06:19:35.553Z"
+    },
+    {
+      "id": "f54b8097-9305-4810-a50a-9f30b9272f71",
+      "name": "아이디어 타입 정의",
+      "description": "Phase 2의 첫 번째 작업. Notion 데이터베이스 스키마에 맞는 TypeScript 타입 정의.\\n\\nNotion DB 필드 매핑:\\n- Title → title: string\\n- Problem → problem: string\\n- Real Case → realCase: string\\n- AI Approach → aiApproach: string\\n- Target → target: Target[]\\n- Category → category: Category[]\\n- Business Potential → businessPotential: BusinessPotential\\n- Technical Difficulty → technicalDifficulty: TechnicalDifficulty\\n- Created Date → createdAt: string",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "a53fdf6d-fe68-4685-91f0-391db01d5498"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-03-06T06:28:20.232Z",
+      "relatedFiles": [
+        {
+          "path": "src/types/idea.ts",
+          "type": "CREATE",
+          "description": "아이디어 타입 정의"
+        },
+        {
+          "path": "src/types/index.ts",
+          "type": "TO_MODIFY",
+          "description": "타입 익스포트 추가"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "Notion DB 스키마 참조"
+        }
+      ],
+      "implementationGuide": "src/types/idea.ts 생성:\\n\\npseudocode:\\nexport type Target = '의사' | '환자' | '스태프' | '기공사' | '학생'\\nexport type Category = '진단' | '상담' | '운영' | '교육' | '행정'\\nexport type BusinessPotential = '상' | '중' | '하'\\nexport type TechnicalDifficulty = '상' | '중' | '하'\\n\\nexport interface Idea {\\n  id: string\\n  title: string\\n  problem: string\\n  realCase: string\\n  aiApproach: string\\n  target: Target[]\\n  category: Category[]\\n  businessPotential: BusinessPotential\\n  technicalDifficulty: TechnicalDifficulty\\n  createdAt: string\\n}",
+      "verificationCriteria": "1. Idea 인터페이스가 PRD.md의 Notion DB 스키마와 일치\\n2. 모든 타입에 any 사용 없음\\n3. src/types/index.ts에서 정상 익스포트",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수.",
+      "summary": "src/types/idea.ts에 Notion DB 스키마와 일치하는 TypeScript 타입 정의 완료. Target, Category, BusinessPotential, TechnicalDifficulty 유니온 타입과 Idea 인터페이스를 정의했으며, any 타입 미사용, 한국어 JSDoc 주석 포함. src/types/index.ts에서 re-export 설정 완료.",
+      "completedAt": "2026-03-06T06:28:20.230Z"
+    },
+    {
+      "id": "a0f11d98-7791-44a8-b678-c410e7aaa4fb",
+      "name": "Notion API 서버리스 함수 구현",
+      "description": "Phase 2 작업. CORS 문제 해결을 위한 Vercel Serverless Functions 구현. 아이디어 목록 조회 및 단일 조회 API 엔드포인트 생성.",
+      "notes": "@notionhq/client 패키지 설치 필요: npm install @notionhq/client",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-03-06T06:42:09.584Z",
+      "relatedFiles": [
+        {
+          "path": "api/ideas/index.ts",
+          "type": "CREATE",
+          "description": "아이디어 목록 API"
+        },
+        {
+          "path": "api/ideas/[id].ts",
+          "type": "CREATE",
+          "description": "아이디어 상세 API"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "@notionhq/client 의존성 추가"
+        }
+      ],
+      "implementationGuide": "1. api/ 디렉토리 생성 (Vercel Serverless Functions)\\n2. api/ideas/index.ts - 목록 조회\\n3. api/ideas/[id].ts - 단일 조회\\n\\npseudocode:\\n// api/ideas/index.ts\\nimport { Client } from '@notionhq/client'\\n\\nexport default async function handler(req, res) {\\n  const notion = new Client({ auth: process.env.NOTION_API_KEY })\\n  const response = await notion.databases.query({\\n    database_id: process.env.NOTION_DATABASE_ID,\\n    sorts: [{ property: 'Created Date', direction: 'descending' }]\\n  })\\n  const ideas = response.results.map(parseNotionPage)\\n  res.json(ideas)\\n}",
+      "verificationCriteria": "1. npm run dev 실행 후 /api/ideas 엔드포인트 응답 확인\\n2. /api/ideas/[id] 엔드포인트 단일 아이디어 반환\\n3. Notion DB 데이터가 Idea 타입으로 정상 파싱",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수.",
+      "summary": "Vercel Serverless Functions로 Notion API 엔드포인트 구현 완료. api/ideas/index.ts(목록 조회)와 api/ideas/[id].ts(단일 조회) 생성. parseNotionPage 유틸리티 분리, CORS 헤더 설정, 에러 처리 포함. @notionhq/client v4, @vercel/node 패키지 설치.",
+      "completedAt": "2026-03-06T06:42:09.582Z"
+    },
+    {
+      "id": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a",
+      "name": "TagBadge 컴포넌트 구현",
+      "description": "Phase 2 작업. 태그 표시용 배지 컴포넌트 구현. Target, Category, BusinessPotential, TechnicalDifficulty 타입별 색상 구분.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
+        }
+      ],
+      "createdAt": "2026-02-05T02:23:14.170Z",
+      "updatedAt": "2026-03-06T06:42:13.024Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/ui/badge.tsx",
+          "type": "CREATE",
+          "description": "shadcn/ui Badge (자동 생성)"
+        },
+        {
+          "path": "src/components/TagBadge.tsx",
+          "type": "CREATE",
+          "description": "태그 배지 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. npx shadcn@latest add badge 실행\\n2. src/components/TagBadge.tsx 생성\\n\\npseudocode:\\ninterface TagBadgeProps {\\n  type: 'target' | 'category' | 'potential' | 'difficulty'\\n  value: string\\n}\\n\\nconst colorMap = {\\n  target: { 의사: 'blue', 환자: 'green', ... },\\n  potential: { 상: 'red', 중: 'yellow', 하: 'gray' },\\n  ...\\n}\\n\\nexport function TagBadge({ type, value }: TagBadgeProps) {\\n  return <Badge variant={getVariant(type, value)}>{value}</Badge>\\n}",
+      "verificationCriteria": "1. TagBadge 컴포넌트가 type별로 다른 색상 표시\\n2. 모든 Target, Category, Potential, Difficulty 값 지원\\n3. 반응형 크기 적용",
+      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수.",
+      "summary": "TagBadge 컴포넌트 구현 완료. 제네릭 타입으로 type별 value 타입 안전성 확보. Target/Category/BusinessPotential/TechnicalDifficulty 각 값별 고유 색상 매핑, 다크모드 대응, 반응형 크기(text-xs sm:text-sm) 적용. shadcn/ui Badge 컴포넌트 기반.",
+      "completedAt": "2026-03-06T06:42:13.022Z"
+    }
+  ]
+}

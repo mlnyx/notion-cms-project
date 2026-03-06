@@ -1,537 +1,420 @@
 {
   "tasks": [
     {
-      "id": "a53fdf6d-fe68-4685-91f0-391db01d5498",
-      "name": "Notion API 환경 설정",
-      "description": "Phase 1의 핵심 작업. Notion API 연동을 위한 환경 변수 설정 및 기본 클라이언트 구성.\\n\\n작업 내용:\\n1. .env.local 파일 생성 (VITE_NOTION_API_KEY, VITE_NOTION_DATABASE_ID)\\n2. .env.example 파일 생성 (환경 변수 템플릿)\\n3. vite.config.ts에 환경 변수 타입 추가\\n4. Notion API 연결 테스트용 간단한 스크립트 작성",
-      "notes": "Notion API는 브라우저에서 직접 호출 시 CORS 에러 발생. Phase 1에서는 환경 설정만 완료하고, 실제 API 호출은 Phase 2에서 서버리스 함수로 구현.",
-      "status": "pending",
+      "id": "3890b247-8b9b-4378-8d8e-bf177d2f2463",
+      "name": "Phase 2-1: 필터 스토어 및 필터 패널 구현",
+      "description": "Zustand 기반 필터 스토어(useFilterStore)를 생성하고 FilterPanel 컴포넌트를 구현한다.\\n\\n필터 스토어 상태: selectedTargets(Target[]), selectedCategories(Category[]), selectedPotentials(BusinessPotential[]), selectedDifficulties(TechnicalDifficulty[]), searchQuery(string), sortBy(SortOption).\\n액션: toggleTarget, toggleCategory, togglePotential, toggleDifficulty, setSearchQuery, setSortBy, resetFilters.\\n\\nFilterPanel: 대상/영역/사업성/난이도 4개 섹션, 각 섹션에서 다중 선택 토글 UI (Badge 클릭 방식), 활성 필터 표시 및 전체 해제 버튼, 모바일에서 접기/펼치기 (useState로 isOpen 관리).\\n\\nHomePage.tsx에 FilterPanel 통합 및 필터링 로직 적용 (useMemo로 filteredIdeas 계산).",
+      "notes": "TagBadge 컴포넌트의 스타일을 참고하되, FilterPanel에서는 클릭 가능한 인터랙티브 Badge를 사용한다. shadcn/ui의 Badge 컴포넌트 variant를 활용.",
+      "status": "completed",
       "dependencies": [],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": ".env.local",
-          "type": "CREATE",
-          "description": "Notion API 환경 변수"
-        },
-        {
-          "path": ".env.example",
-          "type": "CREATE",
-          "description": "환경 변수 템플릿"
-        },
-        {
-          "path": "src/vite-env.d.ts",
-          "type": "TO_MODIFY",
-          "description": "환경 변수 타입 정의"
-        }
-      ],
-      "implementationGuide": "1. 프로젝트 루트에 .env.local 생성\\n2. VITE_NOTION_API_KEY=secret_xxx 형식으로 환경 변수 정의\\n3. src/vite-env.d.ts에 ImportMetaEnv 타입 확장\\n\\npseudocode:\\ninterface ImportMetaEnv {\\n  VITE_NOTION_API_KEY: string\\n  VITE_NOTION_DATABASE_ID: string\\n}",
-      "verificationCriteria": "1. .env.local 파일이 존재하고 환경 변수가 정의됨\\n2. .env.example 파일이 커밋 가능한 상태로 존재\\n3. TypeScript에서 import.meta.env 자동완성 동작",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "f54b8097-9305-4810-a50a-9f30b9272f71",
-      "name": "아이디어 타입 정의",
-      "description": "Phase 2의 첫 번째 작업. Notion 데이터베이스 스키마에 맞는 TypeScript 타입 정의.\\n\\nNotion DB 필드 매핑:\\n- Title → title: string\\n- Problem → problem: string\\n- Real Case → realCase: string\\n- AI Approach → aiApproach: string\\n- Target → target: Target[]\\n- Category → category: Category[]\\n- Business Potential → businessPotential: BusinessPotential\\n- Technical Difficulty → technicalDifficulty: TechnicalDifficulty\\n- Created Date → createdAt: string",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "a53fdf6d-fe68-4685-91f0-391db01d5498"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/types/idea.ts",
-          "type": "CREATE",
-          "description": "아이디어 타입 정의"
-        },
-        {
-          "path": "src/types/index.ts",
-          "type": "TO_MODIFY",
-          "description": "타입 익스포트 추가"
-        },
-        {
-          "path": "docs/PRD.md",
-          "type": "REFERENCE",
-          "description": "Notion DB 스키마 참조"
-        }
-      ],
-      "implementationGuide": "src/types/idea.ts 생성:\\n\\npseudocode:\\nexport type Target = '의사' | '환자' | '스태프' | '기공사' | '학생'\\nexport type Category = '진단' | '상담' | '운영' | '교육' | '행정'\\nexport type BusinessPotential = '상' | '중' | '하'\\nexport type TechnicalDifficulty = '상' | '중' | '하'\\n\\nexport interface Idea {\\n  id: string\\n  title: string\\n  problem: string\\n  realCase: string\\n  aiApproach: string\\n  target: Target[]\\n  category: Category[]\\n  businessPotential: BusinessPotential\\n  technicalDifficulty: TechnicalDifficulty\\n  createdAt: string\\n}",
-      "verificationCriteria": "1. Idea 인터페이스가 PRD.md의 Notion DB 스키마와 일치\\n2. 모든 타입에 any 사용 없음\\n3. src/types/index.ts에서 정상 익스포트",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "a0f11d98-7791-44a8-b678-c410e7aaa4fb",
-      "name": "Notion API 서버리스 함수 구현",
-      "description": "Phase 2 작업. CORS 문제 해결을 위한 Vercel Serverless Functions 구현. 아이디어 목록 조회 및 단일 조회 API 엔드포인트 생성.",
-      "notes": "@notionhq/client 패키지 설치 필요: npm install @notionhq/client",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "api/ideas/index.ts",
-          "type": "CREATE",
-          "description": "아이디어 목록 API"
-        },
-        {
-          "path": "api/ideas/[id].ts",
-          "type": "CREATE",
-          "description": "아이디어 상세 API"
-        },
-        {
-          "path": "package.json",
-          "type": "TO_MODIFY",
-          "description": "@notionhq/client 의존성 추가"
-        }
-      ],
-      "implementationGuide": "1. api/ 디렉토리 생성 (Vercel Serverless Functions)\\n2. api/ideas/index.ts - 목록 조회\\n3. api/ideas/[id].ts - 단일 조회\\n\\npseudocode:\\n// api/ideas/index.ts\\nimport { Client } from '@notionhq/client'\\n\\nexport default async function handler(req, res) {\\n  const notion = new Client({ auth: process.env.NOTION_API_KEY })\\n  const response = await notion.databases.query({\\n    database_id: process.env.NOTION_DATABASE_ID,\\n    sorts: [{ property: 'Created Date', direction: 'descending' }]\\n  })\\n  const ideas = response.results.map(parseNotionPage)\\n  res.json(ideas)\\n}",
-      "verificationCriteria": "1. npm run dev 실행 후 /api/ideas 엔드포인트 응답 확인\\n2. /api/ideas/[id] 엔드포인트 단일 아이디어 반환\\n3. Notion DB 데이터가 Idea 타입으로 정상 파싱",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "365942dd-d7f5-44b9-afc9-066ab0b550b7",
-      "name": "아이디어 조회 훅 구현",
-      "description": "Phase 2 작업. TanStack Query를 활용한 아이디어 데이터 조회 커스텀 훅 구현.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "a0f11d98-7791-44a8-b678-c410e7aaa4fb"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/hooks/useIdeas.ts",
-          "type": "CREATE",
-          "description": "아이디어 조회 훅"
-        },
-        {
-          "path": "src/lib/queryClient.ts",
-          "type": "REFERENCE",
-          "description": "Query 클라이언트 설정 참조"
-        }
-      ],
-      "implementationGuide": "src/hooks/useIdeas.ts 생성:\\n\\npseudocode:\\nimport { useQuery } from '@tanstack/react-query'\\nimport type { Idea } from '@/types/idea'\\n\\nasync function fetchIdeas(): Promise<Idea[]> {\\n  const res = await fetch('/api/ideas')\\n  return res.json()\\n}\\n\\nasync function fetchIdeaById(id: string): Promise<Idea> {\\n  const res = await fetch(`/api/ideas/${id}`)\\n  return res.json()\\n}\\n\\nexport function useIdeas() {\\n  return useQuery({ queryKey: ['ideas'], queryFn: fetchIdeas })\\n}\\n\\nexport function useIdeaById(id: string) {\\n  return useQuery({ queryKey: ['ideas', id], queryFn: () => fetchIdeaById(id) })\\n}",
-      "verificationCriteria": "1. useIdeas() 훅이 아이디어 배열 반환\\n2. useIdeaById(id) 훅이 단일 아이디어 반환\\n3. 로딩, 에러 상태 정상 처리",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a",
-      "name": "TagBadge 컴포넌트 구현",
-      "description": "Phase 2 작업. 태그 표시용 배지 컴포넌트 구현. Target, Category, BusinessPotential, TechnicalDifficulty 타입별 색상 구분.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "f54b8097-9305-4810-a50a-9f30b9272f71"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/components/ui/badge.tsx",
-          "type": "CREATE",
-          "description": "shadcn/ui Badge (자동 생성)"
-        },
-        {
-          "path": "src/components/TagBadge.tsx",
-          "type": "CREATE",
-          "description": "태그 배지 컴포넌트"
-        }
-      ],
-      "implementationGuide": "1. npx shadcn@latest add badge 실행\\n2. src/components/TagBadge.tsx 생성\\n\\npseudocode:\\ninterface TagBadgeProps {\\n  type: 'target' | 'category' | 'potential' | 'difficulty'\\n  value: string\\n}\\n\\nconst colorMap = {\\n  target: { 의사: 'blue', 환자: 'green', ... },\\n  potential: { 상: 'red', 중: 'yellow', 하: 'gray' },\\n  ...\\n}\\n\\nexport function TagBadge({ type, value }: TagBadgeProps) {\\n  return <Badge variant={getVariant(type, value)}>{value}</Badge>\\n}",
-      "verificationCriteria": "1. TagBadge 컴포넌트가 type별로 다른 색상 표시\\n2. 모든 Target, Category, Potential, Difficulty 값 지원\\n3. 반응형 크기 적용",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "34674e82-7f81-4869-878a-d6f048625407",
-      "name": "IdeaCard 컴포넌트 구현",
-      "description": "Phase 3 핵심 작업. 아이디어 목록에서 사용할 카드 컴포넌트. 제목, 타겟 태그, 사업성/난이도 배지 표시.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a"
-        },
-        {
-          "taskId": "365942dd-d7f5-44b9-afc9-066ab0b550b7"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/components/IdeaCard.tsx",
-          "type": "CREATE",
-          "description": "아이디어 카드 컴포넌트"
-        },
-        {
-          "path": "src/components/ui/card.tsx",
-          "type": "REFERENCE",
-          "description": "기존 Card 컴포넌트 활용"
-        }
-      ],
-      "implementationGuide": "src/components/IdeaCard.tsx 생성:\\n\\npseudocode:\\nimport { Card, CardHeader, CardContent } from '@/components/ui/card'\\nimport { TagBadge } from './TagBadge'\\nimport { Link } from '@tanstack/react-router'\\nimport type { Idea } from '@/types/idea'\\n\\ninterface IdeaCardProps {\\n  idea: Idea\\n}\\n\\nexport function IdeaCard({ idea }: IdeaCardProps) {\\n  return (\\n    <Link to='/ideas/$id' params={{ id: idea.id }}>\\n      <Card className='hover:shadow-lg transition-shadow'>\\n        <CardHeader>\\n          <h3>{idea.title}</h3>\\n          <div className='flex gap-2'>\\n            {idea.target.map(t => <TagBadge type='target' value={t} />)}\\n          </div>\\n        </CardHeader>\\n        <CardContent>\\n          <div className='flex gap-2'>\\n            <TagBadge type='potential' value={idea.businessPotential} />\\n            <TagBadge type='difficulty' value={idea.technicalDifficulty} />\\n          </div>\\n        </CardContent>\\n      </Card>\\n    </Link>\\n  )\\n}",
-      "verificationCriteria": "1. 카드에 제목, 타겟 태그, 사업성/난이도 배지 표시\\n2. 카드 클릭 시 상세 페이지로 이동\\n3. hover 효과 적용\\n4. 반응형 레이아웃",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "641b21b6-7023-4041-8f4b-6d186585db0b",
-      "name": "IdeaDetail 컴포넌트 구현",
-      "description": "Phase 3 핵심 작업. 아이디어 상세 정보를 섹션별로 구조화하여 표시하는 컴포넌트.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "72cc4989-c7dd-40ff-bb9e-93abdb4b585a"
-        },
-        {
-          "taskId": "365942dd-d7f5-44b9-afc9-066ab0b550b7"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/components/IdeaDetail.tsx",
-          "type": "CREATE",
-          "description": "아이디어 상세 컴포넌트"
-        }
-      ],
-      "implementationGuide": "src/components/IdeaDetail.tsx 생성:\\n\\npseudocode:\\ninterface IdeaDetailProps {\\n  idea: Idea\\n}\\n\\nexport function IdeaDetail({ idea }: IdeaDetailProps) {\\n  return (\\n    <article className='space-y-8'>\\n      <header>\\n        <h1>{idea.title}</h1>\\n        <div className='flex gap-2'>{/* 모든 태그 표시 */}</div>\\n      </header>\\n      \\n      <Section title='문제 정의'>{idea.problem}</Section>\\n      <Section title='실제 사례'>{idea.realCase}</Section>\\n      <Section title='AI 접근 방식'>{idea.aiApproach}</Section>\\n      \\n      <footer>\\n        <div>사업성: {idea.businessPotential}</div>\\n        <div>기술 난이도: {idea.technicalDifficulty}</div>\\n        <div>작성일: {formatDate(idea.createdAt)}</div>\\n      </footer>\\n    </article>\\n  )\\n}",
-      "verificationCriteria": "1. 문제 정의, 실제 사례, AI 접근 방식 섹션 구분 표시\\n2. 모든 태그 및 평가 정보 표시\\n3. 작성일 포맷팅\\n4. 반응형 레이아웃",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "5b10302f-6c4f-407a-a112-f244afd0d913",
-      "name": "아이디어 목록 페이지 구현",
-      "description": "Phase 3 핵심 작업. 메인 아이디어 목록 페이지. IdeaCard 그리드로 최신순 표시.",
-      "notes": "npx shadcn@latest add skeleton 실행하여 로딩 스켈레톤 추가",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "34674e82-7f81-4869-878a-d6f048625407"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/pages/IdeasPage.tsx",
-          "type": "CREATE",
-          "description": "아이디어 목록 페이지"
-        },
-        {
-          "path": "src/pages/index.ts",
-          "type": "TO_MODIFY",
-          "description": "페이지 익스포트 추가"
-        },
-        {
-          "path": "src/app/router.tsx",
-          "type": "TO_MODIFY",
-          "description": "/ideas 라우트 추가"
-        }
-      ],
-      "implementationGuide": "1. src/pages/IdeasPage.tsx 생성\\n2. src/pages/index.ts에 익스포트 추가\\n3. router.tsx에 /ideas 라우트 추가\\n\\npseudocode:\\nexport function IdeasPage() {\\n  const { data: ideas, isLoading, error } = useIdeas()\\n  \\n  if (isLoading) return <LoadingSkeleton />\\n  if (error) return <ErrorMessage />\\n  \\n  return (\\n    <div className='container mx-auto px-4 py-8'>\\n      <h1>치과 AI 아이디어</h1>\\n      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>\\n        {ideas?.map(idea => <IdeaCard key={idea.id} idea={idea} />)}\\n      </div>\\n    </div>\\n  )\\n}",
-      "verificationCriteria": "1. /ideas 경로에서 아이디어 목록 그리드 표시\\n2. 최신순 정렬\\n3. 로딩/에러 상태 처리\\n4. 반응형 그리드 (1/2/3열)",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "e3c2ec52-f1d9-45d5-8562-fdfa57dc6388",
-      "name": "아이디어 상세 페이지 구현",
-      "description": "Phase 3 핵심 작업. 개별 아이디어 상세 페이지. URL 파라미터로 ID 받아 IdeaDetail 표시.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "641b21b6-7023-4041-8f4b-6d186585db0b"
-        },
-        {
-          "taskId": "5b10302f-6c4f-407a-a112-f244afd0d913"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/pages/IdeaDetailPage.tsx",
-          "type": "CREATE",
-          "description": "아이디어 상세 페이지"
-        },
-        {
-          "path": "src/pages/index.ts",
-          "type": "TO_MODIFY",
-          "description": "페이지 익스포트 추가"
-        },
-        {
-          "path": "src/app/router.tsx",
-          "type": "TO_MODIFY",
-          "description": "/ideas/$id 라우트 추가"
-        }
-      ],
-      "implementationGuide": "1. src/pages/IdeaDetailPage.tsx 생성\\n2. router.tsx에 /ideas/$id 라우트 추가\\n\\npseudocode:\\nexport function IdeaDetailPage() {\\n  const { id } = Route.useParams()\\n  const { data: idea, isLoading, error } = useIdeaById(id)\\n  \\n  if (isLoading) return <LoadingSkeleton />\\n  if (error || !idea) return <NotFound />\\n  \\n  return (\\n    <div className='container mx-auto px-4 py-8'>\\n      <BackButton />\\n      <IdeaDetail idea={idea} />\\n    </div>\\n  )\\n}\\n\\n// router.tsx\\nconst ideaDetailRoute = createRoute({\\n  getParentRoute: () => rootRoute,\\n  path: '/ideas/$id',\\n  component: IdeaDetailPage\\n})",
-      "verificationCriteria": "1. /ideas/[id] 경로에서 해당 아이디어 상세 표시\\n2. 존재하지 않는 ID 접근 시 404 처리\\n3. 뒤로가기 버튼 동작\\n4. 로딩/에러 상태 처리",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "08b7214d-b02a-48b1-9ffa-c933ae2d5207",
-      "name": "Header 네비게이션 업데이트",
-      "description": "Phase 3 마무리 작업. Header에 아이디어 목록 페이지 링크 추가 및 사이트 제목 변경.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "5b10302f-6c4f-407a-a112-f244afd0d913"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
-        {
-          "path": "src/components/layout/Header.tsx",
-          "type": "TO_MODIFY",
-          "description": "네비게이션 링크 추가",
-          "lineStart": 16,
-          "lineEnd": 32
-        }
-      ],
-      "implementationGuide": "src/components/layout/Header.tsx 수정:\\n\\npseudocode:\\n// 기존 nav 링크에 추가\\n<Link to='/ideas'>아이디어</Link>\\n\\n// 사이트 제목 변경\\n<Link to='/' className='text-xl font-bold'>\\n  치과 AI 아이디어 로그북\\n</Link>",
-      "verificationCriteria": "1. Header에 '아이디어' 링크 표시\\n2. 사이트 제목이 '치과 AI 아이디어 로그북'으로 변경\\n3. 활성 페이지 스타일 적용",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "929fbe30-da2f-4e33-b1b6-4dddd5c98986",
-      "name": "필터 상태 관리 구현",
-      "description": "Phase 4 작업. 태그 기반 필터링을 위한 Zustand 스토어 구현.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "e3c2ec52-f1d9-45d5-8562-fdfa57dc6388"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:04:09.327Z",
       "relatedFiles": [
         {
           "path": "src/stores/useFilterStore.ts",
           "type": "CREATE",
-          "description": "필터 상태 스토어"
+          "description": "Zustand 필터 스토어"
         },
         {
-          "path": "src/stores/useAuthStore.ts",
+          "path": "src/components/FilterPanel.tsx",
+          "type": "CREATE",
+          "description": "필터 패널 컴포넌트"
+        },
+        {
+          "path": "src/pages/HomePage.tsx",
+          "type": "TO_MODIFY",
+          "description": "필터 패널 통합 및 필터링 로직 추가"
+        },
+        {
+          "path": "src/types/idea.ts",
           "type": "REFERENCE",
-          "description": "스토어 패턴 참조"
+          "description": "Target, Category 등 타입 참조"
+        },
+        {
+          "path": "src/components/TagBadge.tsx",
+          "type": "REFERENCE",
+          "description": "기존 태그 배지 스타일 참조"
+        },
+        {
+          "path": "src/components/ui/badge.tsx",
+          "type": "REFERENCE",
+          "description": "shadcn Badge 컴포넌트"
         }
       ],
-      "implementationGuide": "src/stores/useFilterStore.ts 생성:\\n\\npseudocode:\\nimport { create } from 'zustand'\\nimport type { Target, Category } from '@/types/idea'\\n\\ninterface FilterState {\\n  targets: Target[]\\n  categories: Category[]\\n  searchQuery: string\\n  setTargets: (targets: Target[]) => void\\n  setCategories: (categories: Category[]) => void\\n  setSearchQuery: (query: string) => void\\n  reset: () => void\\n}\\n\\nexport const useFilterStore = create<FilterState>((set) => ({\\n  targets: [],\\n  categories: [],\\n  searchQuery: '',\\n  setTargets: (targets) => set({ targets }),\\n  setCategories: (categories) => set({ categories }),\\n  setSearchQuery: (searchQuery) => set({ searchQuery }),\\n  reset: () => set({ targets: [], categories: [], searchQuery: '' })\\n}))",
-      "verificationCriteria": "1. useFilterStore 훅이 필터 상태 관리\\n2. 타입 안전성 확보 (any 없음)\\n3. reset 함수로 필터 초기화",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. src/stores/useFilterStore.ts 생성:\\n   - Zustand create()로 스토어 정의\\n   - SortOption 타입: 'latest' | 'potential-desc' | 'difficulty-asc'\\n   - toggle 액션: 이미 있으면 제거, 없으면 추가\\n   - resetFilters: 모든 필터 초기화\\n\\n2. src/components/FilterPanel.tsx 생성:\\n   - useFilterStore에서 상태/액션 가져오기\\n   - 각 필터 그룹을 Badge 토글로 렌더링\\n   - 선택된 Badge는 variant='default', 미선택은 variant='outline'\\n   - 모바일: sm 이하에서 접기/펼치기 버튼 표시\\n   - 활성 필터 개수 표시 및 초기화 버튼\\n\\n3. src/pages/HomePage.tsx 수정:\\n   - FilterPanel 추가\\n   - useMemo로 ideas를 필터링하는 로직 구현\\n   - 필터 조건: target/category/potential/difficulty 각각 선택값이 있으면 교집합",
+      "verificationCriteria": "1. 대상/영역/사업성/난이도 각 필터가 다중 선택 토글로 동작\\n2. 필터 선택 시 아이디어 카드 목록이 즉시 필터링됨\\n3. 전체 해제 버튼 클릭 시 모든 필터 초기화\\n4. 모바일(640px 미만)에서 필터 패널 접기/펼치기 동작\\n5. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 2-1 완료: Zustand 필터 스토어(useFilterStore.ts) 생성 - selectedTargets/Categories/Potentials/Difficulties, searchQuery, sortBy 상태 및 toggle/reset 액션 구현. FilterPanel 컴포넌트 생성 - 대상/영역/사업성/난이도 4개 섹션 Badge 토글 UI, 활성 필터 개수 표시, 초기화 버튼, 모바일 접기/펼치기. HomePage에 FilterPanel 통합 및 useMemo 기반 필터링/정렬 로직 적용. TypeScript 타입 체크, lint, build 모두 통과.",
+      "completedAt": "2026-03-06T08:04:09.321Z"
     },
     {
-      "id": "d4c65e56-5836-4414-a1d5-bf61e280c306",
-      "name": "필터링 UI 및 로직 구현",
-      "description": "Phase 4 작업. 태그 기반 필터링 UI 컴포넌트 및 필터 적용 로직 구현.",
-      "status": "pending",
+      "id": "c986fde5-9dad-4787-ba1c-c3c3d20700e7",
+      "name": "Phase 2-2: 검색 및 정렬 구현",
+      "description": "SearchBar 컴포넌트(제목+문제 텍스트 검색, 300ms 디바운스)와 SortSelect 컴포넌트(최신순/사업성/난이도 정렬)를 구현하고 HomePage에 통합한다.\\n\\nSearchBar: input 필드, 디바운스 처리, useFilterStore의 searchQuery와 연동.\\nSortSelect: select UI, useFilterStore의 sortBy와 연동.\\nHomePage: 검색+정렬 로직을 기존 필터링 useMemo에 통합.",
+      "notes": "검색은 대소문자 구분 없이 (toLowerCase) 처리. 정렬 시 사업성/난이도 값 매핑: 상=3, 중=2, 하=1로 변환하여 비교.",
+      "status": "completed",
       "dependencies": [
         {
-          "taskId": "929fbe30-da2f-4e33-b1b6-4dddd5c98986"
+          "taskId": "3890b247-8b9b-4378-8d8e-bf177d2f2463"
         }
       ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:08:41.893Z",
       "relatedFiles": [
         {
-          "path": "src/components/IdeaFilter.tsx",
+          "path": "src/components/SearchBar.tsx",
           "type": "CREATE",
-          "description": "필터 UI 컴포넌트"
+          "description": "검색바 컴포넌트"
         },
         {
-          "path": "src/hooks/useIdeas.ts",
-          "type": "TO_MODIFY",
-          "description": "필터 파라미터 지원"
+          "path": "src/components/SortSelect.tsx",
+          "type": "CREATE",
+          "description": "정렬 선택 컴포넌트"
         },
         {
-          "path": "src/pages/IdeasPage.tsx",
+          "path": "src/pages/HomePage.tsx",
           "type": "TO_MODIFY",
-          "description": "필터 컴포넌트 통합"
+          "description": "검색/정렬 통합"
+        },
+        {
+          "path": "src/stores/useFilterStore.ts",
+          "type": "REFERENCE",
+          "description": "searchQuery, sortBy 상태 참조"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "REFERENCE",
+          "description": "shadcn Input 컴포넌트"
         }
       ],
-      "implementationGuide": "1. src/components/IdeaFilter.tsx 생성\\n2. useIdeas 훅에 필터 파라미터 지원 추가\\n\\npseudocode:\\n// IdeaFilter.tsx\\nexport function IdeaFilter() {\\n  const { targets, categories, setTargets, setCategories } = useFilterStore()\\n  \\n  return (\\n    <div className='flex flex-wrap gap-4'>\\n      <FilterGroup title='대상' options={TARGET_OPTIONS} selected={targets} onChange={setTargets} />\\n      <FilterGroup title='영역' options={CATEGORY_OPTIONS} selected={categories} onChange={setCategories} />\\n    </div>\\n  )\\n}\\n\\n// useIdeas 수정\\nexport function useIdeas(filters?: { targets?: Target[], categories?: Category[] }) {\\n  return useQuery({\\n    queryKey: ['ideas', filters],\\n    queryFn: () => fetchIdeas(filters)\\n  })\\n}",
-      "verificationCriteria": "1. 대상별/영역별 필터 토글 UI\\n2. 필터 적용 시 목록 갱신\\n3. 복수 필터 조합 동작\\n4. 필터 초기화 기능",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. src/components/SearchBar.tsx 생성:\\n   - shadcn/ui Input 사용\\n   - 로컬 state로 inputValue 관리\\n   - useEffect + setTimeout(300ms)으로 디바운스 구현\\n   - 디바운스 후 useFilterStore.setSearchQuery 호출\\n   - Search 아이콘 (lucide-react) 포함\\n   - placeholder: '아이디어 검색...'\\n\\n2. src/components/SortSelect.tsx 생성:\\n   - HTML select 또는 shadcn Select 사용\\n   - 옵션: 최신순(latest), 사업성 높은순(potential-desc), 난이도 낮은순(difficulty-asc)\\n   - useFilterStore.setSortBy 연동\\n\\n3. src/pages/HomePage.tsx 수정:\\n   - SearchBar, SortSelect 추가 (FilterPanel 위 또는 옆)\\n   - useMemo 필터링 로직에 검색 조건 추가: title.includes(query) || problem.includes(query)\\n   - 정렬 로직 추가: sortBy에 따라 배열 sort",
+      "verificationCriteria": "1. 검색어 입력 시 300ms 디바운스 후 제목+문제 필드에서 일치하는 아이디어만 표시\\n2. 정렬 변경 시 카드 순서가 즉시 반영\\n3. 검색과 필터가 동시에 동작 (AND 조건)\\n4. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 2-2 완료: SearchBar 컴포넌트 생성 (300ms 디바운스, lucide Search 아이콘, shadcn Input), SortSelect 컴포넌트 생성 (최신순/사업성 높은순/난이도 낮은순), HomePage에 검색바+정렬을 FilterPanel 위에 반응형 배치. 기존 useMemo 필터링 로직에 이미 검색/정렬이 통합되어 있어 즉시 동작. 빌드 통과.",
+      "completedAt": "2026-03-06T08:08:41.889Z"
     },
     {
-      "id": "92c9cecf-33b8-4c91-9b92-c1ba8a620c83",
-      "name": "검색 기능 구현",
-      "description": "Phase 4 작업. 제목 기반 아이디어 검색 기능 구현.",
-      "status": "pending",
+      "id": "d14e3e0f-ade3-4fec-bd90-700369e3f266",
+      "name": "Phase 2-3: URL 쿼리 파라미터 동기화",
+      "description": "필터/검색/정렬 상태를 URL 쿼리 파라미터에 반영하여, URL 공유 시 동일한 필터 상태로 복원 가능하게 한다.\\n\\nTanStack Router의 searchParams(validateSearch)를 활용하여 URL과 스토어를 양방향 동기화.",
+      "notes": "URL 파라미터가 없을 때는 기본값(전체 표시, 최신순) 유지. 뒤로가기 시에도 필터 상태가 올바르게 복원되어야 함.",
+      "status": "completed",
       "dependencies": [
         {
-          "taskId": "d4c65e56-5836-4414-a1d5-bf61e280c306"
+          "taskId": "c986fde5-9dad-4787-ba1c-c3c3d20700e7"
         }
       ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:09:57.052Z",
       "relatedFiles": [
         {
-          "path": "src/components/SearchInput.tsx",
-          "type": "CREATE",
-          "description": "검색 입력 컴포넌트"
-        },
-        {
-          "path": "src/hooks/useDebouncedValue.ts",
-          "type": "CREATE",
-          "description": "디바운스 훅"
-        },
-        {
-          "path": "src/pages/IdeasPage.tsx",
+          "path": "src/app/router.tsx",
           "type": "TO_MODIFY",
-          "description": "검색 컴포넌트 통합"
+          "description": "searchParams 스키마 추가"
+        },
+        {
+          "path": "src/pages/HomePage.tsx",
+          "type": "TO_MODIFY",
+          "description": "URL 동기화 로직 추가"
+        },
+        {
+          "path": "src/stores/useFilterStore.ts",
+          "type": "TO_MODIFY",
+          "description": "URL 동기화를 위한 getter 추가 가능"
         }
       ],
-      "implementationGuide": "1. src/components/SearchInput.tsx 생성\\n2. API 및 훅에 검색 파라미터 지원\\n\\npseudocode:\\n// SearchInput.tsx\\nexport function SearchInput() {\\n  const { searchQuery, setSearchQuery } = useFilterStore()\\n  const [input, setInput] = useState(searchQuery)\\n  const debouncedSearch = useDebouncedValue(input, 300)\\n  \\n  useEffect(() => {\\n    setSearchQuery(debouncedSearch)\\n  }, [debouncedSearch])\\n  \\n  return <Input placeholder='아이디어 검색...' value={input} onChange={e => setInput(e.target.value)} />\\n}",
-      "verificationCriteria": "1. 검색어 입력 시 300ms 디바운스 적용\\n2. 검색 결과 실시간 갱신\\n3. 빈 검색어 시 전체 목록 표시",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. src/app/router.tsx 수정:\\n   - indexRoute에 validateSearch 추가\\n   - 검색 파라미터 스키마: { target?: string, category?: string, potential?: string, difficulty?: string, q?: string, sort?: string }\\n   - z (zod) 또는 수동 파싱으로 유효성 검증\\n\\n2. src/pages/HomePage.tsx 수정:\\n   - useSearch() 훅으로 URL 파라미터 읽기\\n   - useNavigate()로 필터 변경 시 URL 업데이트\\n   - 초기 로드 시 URL 파라미터 -> useFilterStore 동기화\\n   - 스토어 변경 시 -> URL 파라미터 업데이트 (useEffect)\\n   - 배열 값은 콤마 구분 문자열로 직렬화 (예: target=의사,환자)",
+      "verificationCriteria": "1. 필터/검색/정렬 변경 시 URL 쿼리 파라미터가 업데이트됨\\n2. URL을 직접 입력하거나 공유된 URL 접속 시 필터 상태가 복원됨\\n3. 브라우저 뒤로가기/앞으로가기 시 필터 상태 올바르게 동작\\n4. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 2-3 완료: router.tsx에 HomeSearchParams 타입 및 validateSearch 추가 (target/category/potential/difficulty/q/sort 파라미터). useFilterStore에 setFilters 일괄 설정 액션 추가. HomePage에서 마운트 시 URL->스토어 복원, 필터 변경 시 스토어->URL 업데이트(replace). 콤마 구분 직렬화/역직렬화, 기본값일 때 파라미터 생략 처리. 빌드 통과.",
+      "completedAt": "2026-03-06T08:09:57.049Z"
     },
     {
-      "id": "c20e2dd5-d190-48e7-9312-6cd2d655f857",
-      "name": "SEO 메타데이터 설정",
-      "description": "Phase 4 작업. react-helmet-async를 활용한 페이지별 메타데이터 및 Open Graph 태그 설정.",
-      "notes": "App.tsx에 HelmetProvider 래핑 필요",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "92c9cecf-33b8-4c91-9b92-c1ba8a620c83"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "id": "fc7a1c12-a92d-497a-89a3-aeb2f172e300",
+      "name": "Phase 4-1: SEO 메타태그 및 공유 기능",
+      "description": "react-helmet-async를 도입하여 페이지별 SEO 메타태그(title, description, OG 태그)를 설정하고, ShareButton 컴포넌트를 구현한다.\\n\\nSEOHead 컴포넌트: 페이지별 title, description, og:title, og:description, og:type 설정.\\nShareButton: Web Share API 지원 시 네이티브 공유, 미지원 시 클립보드 복사.",
+      "notes": "Phase 2와 병행 가능한 독립 작업. OG 이미지 자동 생성(api/og.ts)은 선택사항으로 별도 진행.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:04:13.655Z",
       "relatedFiles": [
         {
-          "path": "src/components/SEO.tsx",
+          "path": "src/components/SEOHead.tsx",
           "type": "CREATE",
-          "description": "SEO 컴포넌트"
+          "description": "SEO 메타태그 컴포넌트"
+        },
+        {
+          "path": "src/components/ShareButton.tsx",
+          "type": "CREATE",
+          "description": "공유 버튼 컴포넌트"
         },
         {
           "path": "src/app/App.tsx",
           "type": "TO_MODIFY",
-          "description": "HelmetProvider 추가"
+          "description": "HelmetProvider 래핑"
         },
         {
-          "path": "src/pages/IdeasPage.tsx",
+          "path": "src/pages/HomePage.tsx",
           "type": "TO_MODIFY",
-          "description": "SEO 적용"
+          "description": "SEOHead 추가"
         },
         {
           "path": "src/pages/IdeaDetailPage.tsx",
           "type": "TO_MODIFY",
-          "description": "SEO 적용"
-        },
-        {
-          "path": "package.json",
-          "type": "TO_MODIFY",
-          "description": "react-helmet-async 의존성"
+          "description": "SEOHead + ShareButton 추가"
         }
       ],
-      "implementationGuide": "1. npm install react-helmet-async\\n2. src/components/SEO.tsx 생성\\n3. 각 페이지에 SEO 컴포넌트 적용\\n\\npseudocode:\\n// SEO.tsx\\nimport { Helmet } from 'react-helmet-async'\\n\\ninterface SEOProps {\\n  title: string\\n  description?: string\\n  ogImage?: string\\n}\\n\\nexport function SEO({ title, description, ogImage }: SEOProps) {\\n  const fullTitle = `${title} | 치과 AI 아이디어 로그북`\\n  return (\\n    <Helmet>\\n      <title>{fullTitle}</title>\\n      <meta name='description' content={description} />\\n      <meta property='og:title' content={fullTitle} />\\n      <meta property='og:description' content={description} />\\n      {ogImage && <meta property='og:image' content={ogImage} />}\\n    </Helmet>\\n  )\\n}",
-      "verificationCriteria": "1. 각 페이지별 고유 title 설정\\n2. Open Graph 메타 태그 생성\\n3. 상세 페이지에 아이디어 제목 반영",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. react-helmet-async 설치: npm install react-helmet-async\\n\\n2. src/app/App.tsx 수정:\\n   - HelmetProvider로 앱 전체 래핑\\n\\n3. src/components/SEOHead.tsx 생성:\\n   - Helmet 컴포넌트로 title, meta 태그 렌더링\\n   - Props: title, description, ogImage?(optional)\\n\\n4. src/components/ShareButton.tsx 생성:\\n   - navigator.share 지원 체크\\n   - 지원 시: navigator.share({ title, text, url })\\n   - 미지원 시: navigator.clipboard.writeText(url) + 토스트/알림\\n   - Share2 아이콘 (lucide-react) 사용\\n\\n5. 페이지별 SEOHead 적용:\\n   - HomePage: '치과 AI 아이디어 로그북' 제목\\n   - IdeaDetailPage: 아이디어 제목 + 문제 정의를 메타로\\n   - IdeaDetailPage에 ShareButton 추가",
+      "verificationCriteria": "1. 각 페이지에 적절한 title, meta description, OG 태그가 설정됨\\n2. 상세 페이지에서 공유 버튼 클릭 시 네이티브 공유 또는 클립보드 복사 동작\\n3. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 4-1 완료: react-helmet-async 설치 및 App.tsx에 HelmetProvider 래핑. SEOHead 컴포넌트 생성 - title, description, OG 태그 설정. ShareButton 컴포넌트 생성 - Web Share API 지원 시 네이티브 공유, 미지원 시 클립보드 복사 + 시각적 피드백. HomePage에 SEOHead 적용, IdeaDetailPage에 SEOHead + ShareButton 적용. 빌드 및 lint 통과.",
+      "completedAt": "2026-03-06T08:04:13.654Z"
     },
     {
-      "id": "c65be886-9aaf-46d8-bac8-ce30004ccacb",
-      "name": "성능 최적화 및 캐싱 전략",
-      "description": "Phase 5 작업. TanStack Query 캐싱 최적화 및 코드 스플리팅 적용.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "c20e2dd5-d190-48e7-9312-6cd2d655f857"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "id": "7d935153-5038-4177-ade8-def9bc717b79",
+      "name": "Phase 4-2: RSS 피드 API",
+      "description": "Vercel Serverless Function으로 RSS 2.0 피드를 제공하는 API 엔드포인트를 구현한다. /api/feed 접속 시 최신 아이디어를 RSS XML로 반환.",
+      "notes": "RSS 피드의 link는 배포된 사이트 URL + /ideas/{id} 형태. 환경변수로 SITE_URL 설정 필요할 수 있음.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:04:17.559Z",
       "relatedFiles": [
         {
-          "path": "src/lib/queryClient.ts",
-          "type": "TO_MODIFY",
-          "description": "캐싱 설정 최적화"
+          "path": "api/feed.ts",
+          "type": "CREATE",
+          "description": "RSS 피드 Serverless Function"
+        },
+        {
+          "path": "api/_lib/notionClient.ts",
+          "type": "REFERENCE",
+          "description": "Notion 클라이언트 재사용"
+        },
+        {
+          "path": "api/_lib/parseNotionPage.ts",
+          "type": "REFERENCE",
+          "description": "페이지 파싱 로직 재사용"
+        },
+        {
+          "path": "api/ideas/index.ts",
+          "type": "REFERENCE",
+          "description": "기존 아이디어 조회 로직 참고"
+        }
+      ],
+      "implementationGuide": "1. api/feed.ts 생성 (Vercel Serverless Function):\\n   - Notion API로 최신 아이디어 조회 (fetchIdeas 로직 재사용)\\n   - RSS 2.0 XML 문자열 생성\\n   - Content-Type: application/rss+xml 헤더 설정\\n   - 각 아이디어를 <item>으로 변환: <title>, <description>(problem), <link>, <pubDate>\\n   - <channel> 정보: title='치과 AI 아이디어 로그북', description, link\\n\\n2. api/_lib/notionClient.ts 참조하여 Notion 클라이언트 재사용\\n3. api/_lib/parseNotionPage.ts 참조하여 파싱 로직 재사용",
+      "verificationCriteria": "1. /api/feed 접속 시 유효한 RSS 2.0 XML 반환\\n2. Content-Type이 application/rss+xml\\n3. 아이디어 목록이 최신순으로 포함\\n4. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 4-2 완료: api/feed.ts Vercel Serverless Function 생성 - Notion API로 최신 아이디어 조회, RSS 2.0 XML 생성, Content-Type application/rss+xml 설정, XML 특수문자 이스케이프 처리, Cache-Control 헤더(1시간) 적용. 기존 notionClient/parseNotionPage 재사용. SITE_URL 환경변수 지원. 빌드 통과.",
+      "completedAt": "2026-03-06T08:04:17.557Z"
+    },
+    {
+      "id": "36e90c54-32c4-48e1-8491-41332c95cd74",
+      "name": "Phase 3-1: 대시보드 페이지 및 통계 카드",
+      "description": "/dashboard 라우트에 대시보드 페이지를 생성하고, 통계 카드(총 아이디어 수, 카테고리별 분포, 대상별 분포)를 구현한다. Header에 대시보드 네비게이션 링크를 추가한다.",
+      "notes": "차트 라이브러리 도입 없이 CSS 기반으로 간단한 바 차트 구현. 추후 recharts 등 도입 가능.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "3890b247-8b9b-4378-8d8e-bf177d2f2463"
+        }
+      ],
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:08:45.490Z",
+      "relatedFiles": [
+        {
+          "path": "src/pages/DashboardPage.tsx",
+          "type": "CREATE",
+          "description": "대시보드 페이지"
+        },
+        {
+          "path": "src/components/StatCard.tsx",
+          "type": "CREATE",
+          "description": "통계 카드 컴포넌트"
         },
         {
           "path": "src/app/router.tsx",
           "type": "TO_MODIFY",
-          "description": "코드 스플리팅 적용"
-        }
-      ],
-      "implementationGuide": "1. queryClient 설정 최적화\\n2. React.lazy를 활용한 페이지 코드 스플리팅\\n3. 이미지 최적화 (있을 경우)\\n\\npseudocode:\\n// queryClient.ts 최적화\\nexport const queryClient = new QueryClient({\\n  defaultOptions: {\\n    queries: {\\n      staleTime: 10 * 60 * 1000, // 10분\\n      gcTime: 30 * 60 * 1000, // 30분\\n      refetchOnMount: false\\n    }\\n  }\\n})\\n\\n// router.tsx 코드 스플리팅\\nconst IdeasPage = lazy(() => import('@/pages/IdeasPage'))\\nconst IdeaDetailPage = lazy(() => import('@/pages/IdeaDetailPage'))",
-      "verificationCriteria": "1. 페이지 전환 시 캐시된 데이터 즉시 표시\\n2. 코드 스플리팅으로 초기 번들 크기 감소\\n3. Lighthouse 성능 점수 80점 이상",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
-    },
-    {
-      "id": "53a331ce-9526-43c8-88ef-05b6d773fbb4",
-      "name": "반응형 디자인 점검 및 개선",
-      "description": "Phase 5 작업. 모바일/태블릿/데스크톱 전 화면 크기에서 레이아웃 점검 및 개선.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "c65be886-9aaf-46d8-bac8-ce30004ccacb"
-        }
-      ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
-      "relatedFiles": [
+          "description": "/dashboard 라우트 추가"
+        },
         {
           "path": "src/components/layout/Header.tsx",
           "type": "TO_MODIFY",
-          "description": "모바일 네비게이션"
+          "description": "대시보드 네비게이션 추가"
         },
         {
-          "path": "src/pages/IdeasPage.tsx",
+          "path": "src/pages/index.ts",
           "type": "TO_MODIFY",
-          "description": "반응형 그리드"
+          "description": "DashboardPage export"
         },
         {
-          "path": "src/components/IdeaFilter.tsx",
-          "type": "TO_MODIFY",
-          "description": "모바일 필터 UI"
+          "path": "src/hooks/useIdeas.ts",
+          "type": "REFERENCE",
+          "description": "useIdeas 훅 재사용"
         }
       ],
-      "implementationGuide": "전체 컴포넌트 반응형 점검:\\n\\n1. Header: 모바일 햄버거 메뉴 필요 여부 확인\\n2. IdeaCard 그리드: sm:1열, md:2열, lg:3열\\n3. IdeaDetail: 모바일에서 섹션 간격 조정\\n4. IdeaFilter: 모바일에서 접기/펼치기\\n5. Footer: 모바일 레이아웃\\n\\npseudocode:\\n// 반응형 그리드 예시\\n<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>",
-      "verificationCriteria": "1. 320px~1920px 화면에서 깨짐 없음\\n2. 터치 영역 최소 44px 확보\\n3. 텍스트 가독성 유지",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. src/components/StatCard.tsx 생성:\\n   - Props: title(string), value(string|number), description?(string)\\n   - shadcn Card 컴포넌트 활용\\n\\n2. src/pages/DashboardPage.tsx 생성:\\n   - useIdeas() 훅으로 전체 아이디어 데이터 가져오기\\n   - useMemo로 통계 계산: 총 개수, 카테고리별 분포(Map), 대상별 분포(Map), 사업성 분포, 난이도 분포\\n   - StatCard로 주요 수치 표시\\n   - 분포 데이터는 CSS 기반 바 차트 (div width 비율)로 시각화\\n   - 반응형 그리드: grid-cols-2 md:grid-cols-4\\n\\n3. src/app/router.tsx 수정:\\n   - /dashboard 라우트 추가 (DashboardPage 컴포넌트)\\n\\n4. src/components/layout/Header.tsx 수정:\\n   - 대시보드 링크 추가\\n\\n5. src/pages/index.ts 수정:\\n   - DashboardPage export 추가",
+      "verificationCriteria": "1. /dashboard 접속 시 통계 대시보드 표시\\n2. 총 아이디어 수, 카테고리별/대상별/사업성별/난이도별 분포 확인 가능\\n3. Header에서 대시보드 링크 클릭 시 이동\\n4. 반응형 레이아웃 적용\\n5. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 3-1 완료: DashboardPage 생성 (/dashboard 라우트), StatCard 컴포넌트 생성 (총 아이디어/카테고리/대상/사업성 높음 4개 수치), CSS 바 차트로 대상별/카테고리별/사업성/난이도 분포 시각화 (차트 라이브러리 없이), Header에 대시보드 네비게이션 추가, 반응형 그리드 적용. 빌드 통과.",
+      "completedAt": "2026-03-06T08:08:45.488Z"
     },
     {
-      "id": "1a493e3a-3778-440d-93b2-5d65a4f59b5d",
-      "name": "Vercel 배포 설정",
-      "description": "Phase 5 최종 작업. Vercel 프로덕션 배포 및 환경 변수 설정.",
-      "notes": "Vercel CLI: npm i -g vercel && vercel",
+      "id": "683dae43-9e29-4bd4-8cea-011b076e6e21",
+      "name": "Phase 3-2: 사업성-난이도 매트릭스 및 관련 아이디어",
+      "description": "사업성-난이도 2D 매트릭스 뷰를 구현하고 (DashboardPage에 배치), 상세 페이지 하단에 관련 아이디어 추천 섹션을 추가한다.\\n\\nMatrixView: 3x3 그리드, 각 셀에 해당 아이디어 수 표시, 셀 클릭 시 해당 조건의 필터가 적용된 홈페이지로 이동.\\nRelatedIdeas: 동일 카테고리/대상 태그 기반 매칭, 최대 3개 표시.",
+      "notes": "매트릭스 셀 클릭 -> 필터 연동은 Phase 2-3(URL 파라미터 동기화) 완료 후 정상 동작. RelatedIdeas에서 IdeaCard 재사용.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "36e90c54-32c4-48e1-8491-41332c95cd74"
+        },
+        {
+          "taskId": "d14e3e0f-ade3-4fec-bd90-700369e3f266"
+        }
+      ],
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:11:13.346Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/MatrixView.tsx",
+          "type": "CREATE",
+          "description": "사업성-난이도 매트릭스 컴포넌트"
+        },
+        {
+          "path": "src/components/RelatedIdeas.tsx",
+          "type": "CREATE",
+          "description": "관련 아이디어 추천 컴포넌트"
+        },
+        {
+          "path": "src/pages/DashboardPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "MatrixView 추가"
+        },
+        {
+          "path": "src/pages/IdeaDetailPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "RelatedIdeas 추가"
+        },
+        {
+          "path": "src/components/IdeaCard.tsx",
+          "type": "REFERENCE",
+          "description": "카드 컴포넌트 재사용"
+        }
+      ],
+      "implementationGuide": "1. src/components/MatrixView.tsx 생성:\\n   - Props: ideas(Idea[])\\n   - 3x3 그리드: X축=사업성(상/중/하), Y축=난이도(상/중/하)\\n   - 각 셀: 해당 조건의 아이디어 수 표시 (count)\\n   - 셀 클릭 시 Link to='/' search={{ potential: x, difficulty: y }}로 이동\\n   - 색상 강도로 밀도 표현 (count 기반 bg-opacity)\\n\\n2. src/components/RelatedIdeas.tsx 생성:\\n   - Props: currentIdea(Idea), allIdeas(Idea[])\\n   - 매칭 로직: 동일 category 또는 target 태그 공유하는 아이디어\\n   - 점수 계산: 공유 태그 수가 많을수록 높은 점수\\n   - 자기 자신 제외, 상위 3개 선택\\n   - IdeaCard 컴포넌트 재사용하여 표시\\n\\n3. src/pages/DashboardPage.tsx 수정:\\n   - MatrixView 추가\\n\\n4. src/pages/IdeaDetailPage.tsx 수정:\\n   - useIdeas()로 전체 목록 가져오기\\n   - RelatedIdeas 컴포넌트 추가 (하단)",
+      "verificationCriteria": "1. 대시보드에 3x3 매트릭스 표시, 각 셀에 아이디어 수 표시\\n2. 매트릭스 셀 클릭 시 해당 필터가 적용된 홈페이지로 이동\\n3. 상세 페이지 하단에 관련 아이디어 최대 3개 표시\\n4. 관련 아이디어가 없으면 섹션 미표시\\n5. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6",
+      "summary": "Phase 3-2 완료: MatrixView 컴포넌트 생성 - 3x3 사업성-난이도 매트릭스, 각 셀에 아이디어 수 표시, 밀도 기반 배경색, 셀 클릭 시 해당 필터 적용된 홈페이지로 Link 이동. RelatedIdeas 컴포넌트 생성 - 동일 카테고리/대상 태그 공유 점수 기반 매칭, 자기 자신 제외, 상위 3개 IdeaCard로 표시, 관련 없으면 미표시. DashboardPage에 MatrixView 추가, IdeaDetailPage 하단에 RelatedIdeas 추가. 빌드 통과.",
+      "completedAt": "2026-03-06T08:11:13.344Z"
+    },
+    {
+      "id": "95957346-23c9-4e3e-83c4-cd5cf66a8875",
+      "name": "Phase 5: Notion DB 확장 - 타입/API/UI",
+      "description": "Notion DB에 Status(Select), References(URL), Keywords(Multi-select) 필드를 추가하고, 타입 정의/API 파싱/UI를 확장한다. Status 기반 필터도 FilterPanel에 추가한다.\\n\\n하위호환성 유지: 신규 필드는 모두 optional 처리하여 기존 데이터에서도 오류 없이 동작.",
+      "notes": "Notion DB에 실제로 필드를 추가하는 것은 수동 작업. 코드는 필드가 없어도 오류 없이 동작해야 함 (optional chaining 활용).",
       "status": "pending",
       "dependencies": [
         {
-          "taskId": "53a331ce-9526-43c8-88ef-05b6d773fbb4"
+          "taskId": "3890b247-8b9b-4378-8d8e-bf177d2f2463"
         }
       ],
-      "createdAt": "2026-02-05T02:23:14.170Z",
-      "updatedAt": "2026-02-05T02:23:14.170Z",
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:00:34.091Z",
       "relatedFiles": [
         {
-          "path": "vercel.json",
-          "type": "CREATE",
-          "description": "Vercel 배포 설정"
+          "path": "src/types/idea.ts",
+          "type": "TO_MODIFY",
+          "description": "신규 필드 타입 추가"
         },
         {
-          "path": "package.json",
-          "type": "REFERENCE",
-          "description": "빌드 스크립트 확인"
+          "path": "api/_types/idea.ts",
+          "type": "TO_MODIFY",
+          "description": "서버측 타입 동기화"
+        },
+        {
+          "path": "api/_lib/parseNotionPage.ts",
+          "type": "TO_MODIFY",
+          "description": "신규 필드 파싱 추가"
+        },
+        {
+          "path": "src/components/IdeaCard.tsx",
+          "type": "TO_MODIFY",
+          "description": "Status 배지 추가"
+        },
+        {
+          "path": "src/components/IdeaDetail.tsx",
+          "type": "TO_MODIFY",
+          "description": "References, Keywords, Status 섹션 추가"
+        },
+        {
+          "path": "src/stores/useFilterStore.ts",
+          "type": "TO_MODIFY",
+          "description": "Status 필터 상태 추가"
+        },
+        {
+          "path": "src/components/FilterPanel.tsx",
+          "type": "TO_MODIFY",
+          "description": "Status 필터 UI 추가"
         }
       ],
-      "implementationGuide": "1. vercel.json 설정 파일 생성\\n2. Vercel 프로젝트 환경 변수 설정\\n3. 프로덕션 빌드 테스트\\n\\npseudocode:\\n// vercel.json\\n{\\n  \"buildCommand\": \"npm run build\",\\n  \"outputDirectory\": \"dist\",\\n  \"framework\": \"vite\",\\n  \"rewrites\": [\\n    { \"source\": \"/(.*)\", \"destination\": \"/index.html\" }\\n  ]\\n}\\n\\n// 환경 변수 (Vercel Dashboard)\\n- NOTION_API_KEY (서버리스 함수용, VITE_ 접두사 없음)\\n- NOTION_DATABASE_ID",
-      "verificationCriteria": "1. vercel --prod 명령으로 배포 성공\\n2. 프로덕션 URL에서 정상 동작\\n3. 환경 변수가 안전하게 설정됨\\n4. HTTPS 적용 확인",
-      "analysisResult": "ROADMAP.md 기반 치과 AI 아이디어 로그북 개발. Vite + React 19 + TanStack Router/Query + Zustand 환경에서 Notion CMS 연동 아이디어 조회 시스템 구축. Phase 1~5 순서 준수 필수."
+      "implementationGuide": "1. src/types/idea.ts 수정:\\n   - IdeaStatus 타입 추가: '아이디어' | '검토 중' | '진행 중' | '완료' | '보류'\\n   - Idea 인터페이스에 추가: status?(IdeaStatus), references?(string[]), keywords?(string[])\\n\\n2. api/_types/idea.ts 수정:\\n   - 동일 타입 추가\\n\\n3. api/_lib/parseNotionPage.ts 수정:\\n   - Status(Select) 파싱: properties.Status?.select?.name\\n   - References(URL) 파싱: properties.References?.url\\n   - Keywords(Multi-select) 파싱: properties.Keywords?.multi_select.map(k => k.name)\\n   - 각 필드 null/undefined 처리\\n\\n4. src/components/IdeaCard.tsx 수정:\\n   - Status 배지 추가 (있을 때만 표시)\\n\\n5. src/components/IdeaDetail.tsx 수정:\\n   - References 링크 목록 섹션 추가\\n   - Keywords 태그 표시 섹션 추가\\n   - Status 배지 표시\\n\\n6. src/stores/useFilterStore.ts 수정:\\n   - selectedStatuses(IdeaStatus[]) 추가\\n   - toggleStatus 액션 추가\\n\\n7. src/components/FilterPanel.tsx 수정:\\n   - Status 필터 섹션 추가",
+      "verificationCriteria": "1. API 응답에 status, references, keywords 필드 포함 (null 허용)\\n2. 상세 페이지에서 Status, References, Keywords 표시\\n3. 카드에 Status 배지 표시\\n4. Status 필터가 FilterPanel에서 동작\\n5. 신규 필드 미입력 데이터에서도 오류 없이 동작\\n6. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6"
+    },
+    {
+      "id": "bf62251a-aac5-4fce-ab81-6784a81a3ef6",
+      "name": "Phase 6: 인터랙션 - 투표/댓글/인기순",
+      "description": "아이디어별 공감/투표 기능(Vercel KV 기반), giscus 댓글 연동, 인기순 정렬을 구현한다.\\n\\nVoteButton: 투표 수 표시 + 투표 버튼, localStorage로 중복 방지.\\nComments: giscus 스크립트 임베딩.\\nSortSelect에 인기순 옵션 추가.",
+      "notes": "Vercel KV 설정이 필요함 (환경변수: KV_REST_API_URL, KV_REST_API_TOKEN). giscus는 GitHub 리포지토리 Discussions 활성화 필요. 초기에는 투표만 구현하고 댓글은 giscus 설정 후 활성화할 수 있음.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c986fde5-9dad-4787-ba1c-c3c3d20700e7"
+        }
+      ],
+      "createdAt": "2026-03-06T08:00:34.091Z",
+      "updatedAt": "2026-03-06T08:00:34.091Z",
+      "relatedFiles": [
+        {
+          "path": "api/votes/[id].ts",
+          "type": "CREATE",
+          "description": "투표 API 엔드포인트"
+        },
+        {
+          "path": "src/components/VoteButton.tsx",
+          "type": "CREATE",
+          "description": "투표 버튼 컴포넌트"
+        },
+        {
+          "path": "src/components/Comments.tsx",
+          "type": "CREATE",
+          "description": "giscus 댓글 컴포넌트"
+        },
+        {
+          "path": "src/pages/IdeaDetailPage.tsx",
+          "type": "TO_MODIFY",
+          "description": "투표 + 댓글 섹션 추가"
+        },
+        {
+          "path": "src/components/IdeaCard.tsx",
+          "type": "TO_MODIFY",
+          "description": "투표 수 표시"
+        },
+        {
+          "path": "src/components/SortSelect.tsx",
+          "type": "TO_MODIFY",
+          "description": "인기순 옵션 추가"
+        },
+        {
+          "path": "src/stores/useFilterStore.ts",
+          "type": "TO_MODIFY",
+          "description": "SortOption에 votes-desc 추가"
+        }
+      ],
+      "implementationGuide": "1. api/votes/[id].ts 생성 (Vercel Serverless Function):\\n   - GET: 특정 아이디어의 투표 수 반환\\n   - POST: 투표 수 증가\\n   - Vercel KV (Redis) 사용: kv.get, kv.incr\\n   - 또는 간단한 JSON 파일 기반 (MVP)\\n\\n2. src/components/VoteButton.tsx 생성:\\n   - Props: ideaId(string)\\n   - 투표 수 표시 + Heart/ThumbsUp 아이콘 버튼\\n   - localStorage에 투표 여부 저장: voted-{ideaId}\\n   - 이미 투표했으면 버튼 비활성화 또는 시각적 표시\\n   - useMutation으로 POST 요청\\n\\n3. src/components/Comments.tsx 생성:\\n   - giscus 스크립트를 useEffect로 동적 로드\\n   - data-repo, data-repo-id 등 설정\\n   - Props: ideaId(string) - data-term으로 사용\\n\\n4. src/pages/IdeaDetailPage.tsx 수정:\\n   - VoteButton 추가 (제목 옆 또는 상단)\\n   - Comments 추가 (하단)\\n\\n5. src/components/IdeaCard.tsx 수정:\\n   - 투표 수 표시 (선택)\\n\\n6. src/components/SortSelect.tsx 수정:\\n   - '인기순' 옵션 추가 (SortOption에 'votes-desc' 추가)\\n   - HomePage 정렬 로직에 투표 수 기준 정렬 추가",
+      "verificationCriteria": "1. 아이디어별 투표 버튼 클릭 시 투표 수 증가\\n2. 동일 브라우저에서 중복 투표 방지 (localStorage)\\n3. 상세 페이지 하단에 giscus 댓글 영역 표시\\n4. 인기순 정렬 시 투표 수 기준으로 카드 정렬\\n5. npm run lint && npm run build 통과",
+      "analysisResult": "치과 AI 아이디어 로그북 고도화 프로젝트. Phase 1 MVP 완료 상태에서 Phase 2~6을 순차적으로 구현한다.\\n\\n기술 스택: Vite + React 19 SPA, TanStack Router, TanStack Query, Zustand, Tailwind CSS, shadcn/ui, Vercel Serverless Functions, Notion API.\\n\\n아키텍처: 클라이언트 사이드 필터링 (100건 미만), api/ 디렉토리의 Serverless Functions, src/ 프론트엔드 코드.\\n\\n코딩 규칙: TypeScript strict (any 금지), camelCase 변수/함수, PascalCase 컴포넌트, 2칸 들여쓰기, 한국어 주석, shadcn/ui 컴포넌트 활용, 반응형 필수.\\n\\n권장 순서: Phase 2 -> Phase 4 (병행 가능) -> Phase 3 -> Phase 5 -> Phase 6"
     }
   ]
 }
