@@ -4,6 +4,7 @@ import type {
   Category,
   BusinessPotential,
   TechnicalDifficulty,
+  IdeaStatus,
 } from '@/types/idea';
 
 /** 정렬 옵션 */
@@ -15,6 +16,8 @@ interface FilterState {
   selectedCategories: Category[];
   selectedPotentials: BusinessPotential[];
   selectedDifficulties: TechnicalDifficulty[];
+  selectedStatuses: IdeaStatus[];
+  selectedKeywords: string[];
   searchQuery: string;
   sortBy: SortOption;
 }
@@ -25,6 +28,8 @@ interface FilterActions {
   toggleCategory: (value: Category) => void;
   togglePotential: (value: BusinessPotential) => void;
   toggleDifficulty: (value: TechnicalDifficulty) => void;
+  toggleStatus: (value: IdeaStatus) => void;
+  toggleKeyword: (value: string) => void;
   setSearchQuery: (query: string) => void;
   setSortBy: (sort: SortOption) => void;
   resetFilters: () => void;
@@ -39,6 +44,8 @@ const initialState: FilterState = {
   selectedCategories: [],
   selectedPotentials: [],
   selectedDifficulties: [],
+  selectedStatuses: [],
+  selectedKeywords: [],
   searchQuery: '',
   sortBy: 'latest',
 };
@@ -65,6 +72,12 @@ export const useFilterStore = create<FilterState & FilterActions>((set, get) => 
   toggleDifficulty: (value) =>
     set((s) => ({ selectedDifficulties: toggleArray(s.selectedDifficulties, value) })),
 
+  toggleStatus: (value) =>
+    set((s) => ({ selectedStatuses: toggleArray(s.selectedStatuses, value) })),
+
+  toggleKeyword: (value) =>
+    set((s) => ({ selectedKeywords: toggleArray(s.selectedKeywords, value) })),
+
   setSearchQuery: (query) => set({ searchQuery: query }),
 
   setSortBy: (sort) => set({ sortBy: sort }),
@@ -79,7 +92,9 @@ export const useFilterStore = create<FilterState & FilterActions>((set, get) => 
       s.selectedTargets.length +
       s.selectedCategories.length +
       s.selectedPotentials.length +
-      s.selectedDifficulties.length
+      s.selectedDifficulties.length +
+      s.selectedStatuses.length +
+      s.selectedKeywords.length
     );
   },
 }));

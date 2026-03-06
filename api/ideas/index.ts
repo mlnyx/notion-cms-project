@@ -43,6 +43,9 @@ function parsePage(page: PageObjectResponse) {
     businessPotential: p['Business Potential'] ? getSelect(p['Business Potential'], '중') : '중',
     technicalDifficulty: p['Technical Difficulty'] ? getSelect(p['Technical Difficulty'], '중') : '중',
     createdAt: p['Created Date'] ? getDate(p['Created Date']) : '',
+    status: p['Status'] ? getSelect(p['Status'], '아이디어') : '아이디어',
+    references: p['References']?.type === 'url' && p['References'].url ? [p['References'].url] : [],
+    keywords: p['Keywords'] ? getMultiSelect(p['Keywords']) : [],
   };
 }
 

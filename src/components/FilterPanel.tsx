@@ -8,6 +8,7 @@ import type {
   Category,
   BusinessPotential,
   TechnicalDifficulty,
+  IdeaStatus,
 } from '@/types/idea';
 
 /** 모든 대상 옵션 */
@@ -21,6 +22,9 @@ const ALL_POTENTIALS: BusinessPotential[] = ['상', '중', '하'];
 
 /** 모든 난이도 옵션 */
 const ALL_DIFFICULTIES: TechnicalDifficulty[] = ['상', '중', '하'];
+
+/** 모든 상태 옵션 */
+const ALL_STATUSES: IdeaStatus[] = ['아이디어', '검토중', '개발중', '완료', '보류'];
 
 /** 필터 그룹 컴포넌트 */
 function FilterGroup<T extends string>({
@@ -63,10 +67,12 @@ export function FilterPanel() {
     selectedCategories,
     selectedPotentials,
     selectedDifficulties,
+    selectedStatuses,
     toggleTarget,
     toggleCategory,
     togglePotential,
     toggleDifficulty,
+    toggleStatus,
     resetFilters,
     getActiveFilterCount,
   } = useFilterStore();
@@ -144,6 +150,12 @@ export function FilterPanel() {
           options={ALL_DIFFICULTIES}
           selected={selectedDifficulties}
           onToggle={toggleDifficulty}
+        />
+        <FilterGroup
+          label="상태"
+          options={ALL_STATUSES}
+          selected={selectedStatuses}
+          onToggle={toggleStatus}
         />
       </div>
     </div>

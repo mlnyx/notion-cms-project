@@ -15,6 +15,9 @@ export type BusinessPotential = '상' | '중' | '하';
 /** 기술 난이도 (상/중/하) */
 export type TechnicalDifficulty = '상' | '중' | '하';
 
+/** 아이디어 상태 */
+export type IdeaStatus = '아이디어' | '검토중' | '개발중' | '완료' | '보류';
+
 /** 치과 AI 아이디어 */
 export interface Idea {
   /** Notion 페이지 ID */
@@ -37,4 +40,10 @@ export interface Idea {
   technicalDifficulty: TechnicalDifficulty;
   /** 생성일 (ISO 8601 형식) */
   createdAt: string;
+  /** 아이디어 상태 */
+  status?: IdeaStatus;
+  /** 참고 링크 (URL 목록) */
+  references?: string[];
+  /** 키워드 */
+  keywords?: string[];
 }

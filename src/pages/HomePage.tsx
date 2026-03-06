@@ -46,6 +46,7 @@ export function HomePage() {
     selectedCategories,
     selectedPotentials,
     selectedDifficulties,
+    selectedStatuses,
     searchQuery,
     sortBy,
     setFilters,
@@ -109,6 +110,10 @@ export function HomePage() {
       if (selectedDifficulties.length > 0 && !selectedDifficulties.includes(idea.technicalDifficulty)) {
         return false;
       }
+      // 상태 필터
+      if (selectedStatuses.length > 0 && idea.status && !selectedStatuses.includes(idea.status)) {
+        return false;
+      }
       // 검색어 필터
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -133,7 +138,7 @@ export function HomePage() {
     });
 
     return result;
-  }, [ideas, selectedTargets, selectedCategories, selectedPotentials, selectedDifficulties, searchQuery, sortBy]);
+  }, [ideas, selectedTargets, selectedCategories, selectedPotentials, selectedDifficulties, selectedStatuses, searchQuery, sortBy]);
 
   return (
     <div className="container mx-auto px-4 py-8">
